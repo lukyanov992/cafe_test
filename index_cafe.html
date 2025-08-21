@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fast Food Cafe</title>
-    <!-- Tailwind CSS for modern styling -->
+    <!-- Tailwind CSS для современного оформления -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -22,18 +22,7 @@
             -ms-overflow-style: none;  /* IE and Edge */
             scrollbar-width: none;  /* Firefox */
         }
-        /* Улучшения для свайпов на историях */
-        #story-modal {
-            touch-action: none; /* Предотвращает стандартное поведение, такое как прокрутка */
-        }
-        #story-modal #story-image {
-            user-select: none; /* Предотвращает выделение текста/изображения */
-            -webkit-user-drag: none; /* Отключает перетаскивание на iOS */
-        }
-        .progress-bar {
-            animation: progress-fill 10s linear forwards;
-        }
-
+        
         /* Анимация для модальных окон */
         .modal-enter {
             animation: fadeIn 0.3s ease-out;
@@ -59,35 +48,101 @@
         @keyframes stroke {
             100% { stroke-dashoffset: 0; }
         }
-
+        
+        /* Стили для прогресс-бара заказа */
+        .order-status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .status-step {
+            position: relative;
+            z-index: 10;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            background-color: #4a5568; /* bg-gray-600 */
+            transition: all 0.3s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .status-step.completed {
+            background-color: #10b981; /* bg-green-500 */
+        }
+        .status-line {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 4px;
+            background-color: #4a5568; /* bg-gray-600 */
+            transition: all 0.3s ease-in-out;
+            z-index: 5;
+        }
+        .status-line.completed {
+            background-color: #10b981; /* bg-green-500 */
+        }
+        .status-label {
+            position: absolute;
+            top: 2rem;
+            font-size: 0.75rem;
+            text-align: center;
+            white-space: nowrap;
+            color: #a0aec0; /* text-gray-400 */
+        }
+        .status-label.completed {
+            color: #10b981; /* text-green-500 */
+        }
+        
+        /* Стили для нижней панели корзины */
+        #bottom-cart-menu {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 2rem);
+            max-width: 480px;
+            z-index: 40;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-50%) translateY(100px);
+        }
+        #bottom-cart-menu.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .bounce-in {
+            animation: bounceIn 0.5s cubic-bezier(0.2, 0.5, 0.8, 1.2) forwards;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
-<body class="p-2 sm:p-4 md:p-8 pb-32 lg:pb-16">
+<body class="p-4 sm:p-8 pb-16">
 
-    <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6 md:gap-8 min-h-[calc(100vh-8rem)] lg:min-h-[calc(100vh-4rem)]">
+    <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6 md:gap-8 min-h-[calc(100vh-8rem)]">
+        
+        <!-- Верхний заголовок с кнопками самовывоза и профиля -->
+        <header class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
+            <button id="pickup-button" class="flex items-center gap-1 font-medium bg-[#241E1B] py-2 px-3 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0 text-xs sm:text-sm md:text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                </svg>
+                <span>Самовывоз</span>
+            </button>
+            <button id="top-right-profile-btn" class="flex-shrink-0 bg-[#241E1B] p-2 rounded-full text-white hover:bg-[#332C28] transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </button>
+        </header>
+
         <!-- Основная область контента -->
         <div id="main-content-wrapper" class="w-full">
-            <!-- Верхний заголовок с кнопками самовывоза и поиска -->
-            <header class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
-                <button id="pickup-button" class="flex items-center gap-1 font-medium bg-[#241E1B] py-2 px-3 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0 text-xs sm:text-sm md:text-base">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                    </svg>
-                    <span>Самовывоз</span>
-                </button>
-                <div class="w-full relative mx-1">
-                    <input id="search-input" type="text" placeholder="Поиск по меню..." class="w-full pl-8 pr-2 py-2 bg-gray-800 text-white rounded-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#AB3031] transition-all duration-300 text-xs sm:text-sm md:text-base">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                </div>
-                <button id="filter-button" class="flex items-center justify-center font-medium bg-[#241E1B] p-2 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M10 18h4v-2h-4v2zm-6-8v2h16v-2H4zm6-8v2h4V2h-4z"/>
-                    </svg>
-                </button>
-            </header>
-
+            
             <!-- Контейнер для меню -->
             <div id="menu-view" class="">
                 <!-- Секция историй -->
@@ -103,7 +158,7 @@
                     <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
                         <button data-category="burgers" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-[#AB3031] text-white">Бургеры</button>
                         <button data-category="pizza" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Пицца</button>
-                        <button data-category="snacks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Закуски</button>
+                        <button data-category="snacks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Закуски</button>
                         <button data-category="drinks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Напитки</button>
                     </div>
                 </section>
@@ -142,61 +197,76 @@
             </div>
 
             <!-- Контейнер для корзины (по умолчанию скрыт) -->
-            <div id="cart-view" class="hidden h-full">
-                <aside class="w-full p-4 bg-[#241E1B] rounded-2xl shadow-inner flex flex-col h-full">
-                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Ваш заказ</h2>
-                    <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
-                        <!-- Элементы корзины будут отображены здесь с помощью JS -->
+            <div id="cart-view" class="hidden h-full flex flex-col">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Корзина</h2>
+                <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-4">
+                    <h3 class="text-lg font-bold">Место самовывоза</h3>
+                    <p id="cart-pickup-location" class="text-sm text-gray-400 mt-1">Москва, Тверская улица, 15</p>
+                </div>
+                <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
+                    <!-- Элементы корзины будут отображены здесь с помощью JS -->
+                </div>
+                
+                <!-- Секция "Добавить к заказу" -->
+                <section id="suggested-items-section" class="mt-6 hidden">
+                    <h3 class="text-lg font-bold mb-4">Добавить к заказу</h3>
+                    <div id="suggested-items-list" class="grid grid-cols-2 gap-4">
+                        <!-- Здесь будут предложенные товары -->
                     </div>
-                    <!-- Новая кнопка "Оформить заказ" в корзине -->
-                    <div id="place-order-wrapper" class="mt-4">
-                         <button id="place-order-btn" class="w-full bg-[#AB3031] text-white py-3 px-6 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C] disabled:bg-gray-700 disabled:cursor-not-allowed">
-                            Оформить заказ
-                        </button>
-                    </div>
-                </aside>
+                </section>
+                
+                <!-- Кнопка "Оформить заказ" в корзине -->
+                <div id="place-order-wrapper" class="mt-4">
+                    <button id="place-order-btn" class="w-full bg-[#AB3031] text-white py-3 px-6 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C] disabled:bg-gray-700 disabled:cursor-not-allowed">
+                        Оформить заказ
+                    </button>
+                </div>
             </div>
 
             <!-- Контейнер для профиля (по умолчанию скрыт) -->
-            <div id="profile-view" class="hidden text-center h-[70vh] flex flex-col items-center justify-center p-4">
+            <div id="profile-view" class="hidden h-full">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Профиль</h2>
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 mb-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 3c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5zm0 15c-3.132 0-5.914-.903-7.98-2.618a8.046 8.046 0 0 1 7.98-5.382 8.046 8.046 0 0 1 7.98 5.382C17.914 19.097 15.132 20 12 20z"/></svg>
-                <p class="text-gray-400">Эта функция находится в разработке.</p>
+                <!-- Блок с данными пользователя -->
+                <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-bold">Мои данные</h3>
+                        <button id="edit-profile-btn" class="text-[#AB3031] hover:text-white transition-colors text-sm">
+                            <span id="edit-text">Редактировать</span>
+                            <span id="save-text" class="hidden">Сохранить</span>
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="profile-name" class="block text-xs sm:text-sm font-medium text-gray-400 mb-1">Имя</label>
+                            <input type="text" id="profile-name" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base disabled:opacity-75" placeholder="Ваше имя" readonly>
+                        </div>
+                        <div>
+                            <label for="profile-phone" class="block text-xs sm:text-sm font-medium text-gray-400 mb-1">Номер телефона</label>
+                            <input type="tel" id="profile-phone" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base disabled:opacity-75" placeholder="+7 (XXX) XXX-XX-XX" readonly>
+                            <p id="phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Используйте +7 (XXX) XXX-XX-XX.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Блок с историей заказов -->
+                <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner h-fit overflow-y-auto">
+                    <h3 class="text-lg font-bold mb-4">История заказов</h3>
+                    <div id="order-history-container" class="space-y-4">
+                        <p class="text-gray-400 italic text-sm md:text-base text-center">У вас пока нет заказов.</p>
+                        <!-- Здесь будет отображаться история заказов -->
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
     
-    <!-- Фиксированная кнопка "Итого" -->
-    <div id="bottom-cart-summary" class="fixed bottom-[calc(5rem+1.5rem)] lg:bottom-[1.5rem] left-1/2 -translate-x-1/2 w-11/12 max-w-lg hidden z-40">
-        <div class="bg-white text-gray-900 rounded-full py-3 px-6 shadow-xl flex items-center justify-between transition-opacity duration-300">
-            <div class="flex flex-col items-start">
-                <span class="text-xs sm:text-sm font-semibold text-gray-500">Итого:</span>
-                <span id="summary-total" class="text-base sm:text-xl font-bold">0 ₽</span>
-            </div>
-            <button id="summary-checkout-btn" class="bg-[#AB3031] text-white py-2 px-4 sm:px-6 rounded-full font-bold text-xs sm:text-sm transition-colors hover:bg-[#972C2C]">
-                К оформлению
-            </button>
-        </div>
-    </div>
-
-    <!-- Фиксированное нижнее меню -->
-    <nav class="fixed bottom-4 left-4 right-4 bg-[#AB3031] shadow-2xl z-50 rounded-xl">
-        <div class="flex justify-around items-center h-20 px-4">
-            <button id="nav-menu" class="nav-btn text-white flex flex-col items-center justify-center p-2 rounded-xl transition-transform transform hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M4 11h16v2H4zm0-5h16v2H4zm0 12h16v2H4z"/></svg>
-                <span class="text-xs font-medium">Меню</span>
-            </button>
-            <button id="nav-cart" class="nav-btn text-gray-200 flex flex-col items-center justify-center p-2 rounded-xl transition-transform transform hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0-12L6.1 3H4v2h2.1l3.5 7-1.3 2H17v-2H8.8l.9-2zm8.1 0-1.6-4H20v2h-2.1z"/></svg>
-                <span class="text-xs font-medium">Корзина</span>
-            </button>
-            <button id="nav-profile" class="nav-btn text-gray-200 flex flex-col items-center justify-center p-2 rounded-xl transition-transform transform hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 3c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5zm0 15c-3.132 0-5.914-.903-7.98-2.618a8.046 8.046 0 0 1 7.98-5.382 8.046 8.046 0 0 1 7.98 5.382C17.914 19.097 15.132 20 12 20z"/></svg>
-                <span class="text-xs font-medium">Профиль</span>
-            </button>
-        </div>
-    </nav>
-
+    <!-- Нижняя панель корзины (по умолчанию скрыта) -->
+    <button id="bottom-cart-menu" class="bg-[#AB3031] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0-12L6.1 3H4v2h2.1l3.5 7-1.3 2H17v-2H8.8l.9-2zm8.1 0-1.6-4H20v2h-2.1z"/></svg>
+        <span id="bottom-cart-total-sum" class="font-bold text-lg">0 ₽</span>
+    </button>
+    
     <!-- Модальное окно самовывоза -->
     <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
@@ -217,50 +287,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно фильтров -->
-    <div id="filter-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
-        <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg sm:text-xl md:text-2xl font-bold">Фильтры</h3>
-                <button id="close-filter-modal-btn" class="text-gray-400 hover:text-white transition-colors text-3xl leading-none">&times;</button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label for="min-price" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Минимальная цена (₽)</label>
-                    <input type="number" id="min-price" placeholder="0" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
-                </div>
-                <div>
-                    <label for="max-price" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Максимальная цена (₽)</label>
-                    <input type="number" id="max-price" placeholder="10000" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
-                </div>
-            </div>
-            <div class="flex justify-between items-center mt-6">
-                <button id="clear-filters-btn" class="bg-gray-700 text-white py-2 px-4 rounded-xl hover:bg-gray-600 transition text-sm md:text-base">Сбросить</button>
-                <button id="apply-filters-btn" class="bg-[#AB3031] text-white py-2 px-4 rounded-xl font-bold hover:bg-[#972C2C] transition-transform transform active:scale-95 text-sm md:text-base">Применить</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно просмотра историй -->
-    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50 modal-enter">
-        <!-- Кнопка закрытия -->
-        <button id="close-story-modal-btn" class="absolute top-4 right-4 text-white text-3xl leading-none z-20">&times;</button>
-        <!-- Прогресс-бар -->
-        <div id="story-progress-container" class="absolute top-4 left-0 right-0 p-4 pt-10 flex gap-2 justify-center z-10">
-            <!-- Сегменты прогресс-бара будут добавлены динамически -->
-        </div>
-        <!-- Контент истории -->
-        <div class="relative w-full max-w-xs md:max-w-sm lg:max-w-md aspect-[9/16]">
-            <img id="story-image" src="" alt="Story" class="w-full h-full object-contain rounded-xl shadow-lg">
-            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-4">
-                <p id="story-text" class="text-white text-sm md:text-base font-semibold text-center"></p>
-            </div>
-        </div>
-        <!-- Кнопки навигации -->
-        <button id="prev-story-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10 hidden">&lt;</button>
-        <button id="next-story-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10 hidden">&gt;</button>
-    </div>
-
     <!-- Модальное окно для оформления заказа (новая функциональность) -->
     <div id="order-form-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
@@ -276,6 +302,7 @@
                 <div>
                     <label for="phone" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Номер телефона</label>
                     <input type="tel" id="phone" placeholder="+7 (XXX) XXX-XX-XX" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                    <p id="order-phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Используйте +7 (XXX) XXX-XX-XX.</p>
                 </div>
                 <div>
                     <label for="pickup-time" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Когда заберете</label>
@@ -311,6 +338,25 @@
         </div>
     </div>
     
+    <!-- Модальное окно просмотра историй -->
+    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50 modal-enter">
+        <!-- Кнопка закрытия -->
+        <button id="close-story-modal-btn" class="absolute top-4 right-4 text-white text-3xl leading-none z-20">&times;</button>
+        <!-- Прогресс-бар -->
+        <div id="story-progress-container" class="absolute top-4 left-0 right-0 p-4 pt-10 flex gap-2 justify-center z-10">
+            <!-- Сегменты прогресс-бара будут добавлены динамически -->
+        </div>
+        <!-- Контент истории -->
+        <div class="relative w-full max-w-xs md:max-w-sm lg:max-w-md aspect-[9/16]">
+            <img id="story-image" src="" alt="Story" class="w-full h-full object-contain rounded-xl shadow-lg">
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-4">
+                <p id="story-text" class="text-white text-sm md:text-base font-semibold text-center"></p>
+            </div>
+        </div>
+        <!-- Кнопки навигации -->
+        <button id="prev-story-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&lt;</button>
+        <button id="next-story-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&gt;</button>
+    </div>
 
     <script>
         // Данные для элементов меню
@@ -339,7 +385,7 @@
 
         const allMenuItems = Object.values(menuItems).flat();
 
-        // Данные для историй, теперь с размерами 9:16
+        // Данные для историй
         const storyData = [
             {
                 image: 'https://placehold.co/900x1600/AB3031/ffffff?text=Новый+комбо-набор',
@@ -360,25 +406,26 @@
 
         // DOM элементы
         const pickupButton = document.getElementById('pickup-button');
-        const filterButton = document.getElementById('filter-button');
-        const searchInput = document.getElementById('search-input');
         const categoryTabs = document.getElementById('category-tabs');
         const storyContainer = document.getElementById('story-container');
-        const mainContentWrapper = document.getElementById('main-content-wrapper');
         const menuView = document.getElementById('menu-view');
         const cartView = document.getElementById('cart-view');
         const profileView = document.getElementById('profile-view');
         const cartItemsContainer = document.getElementById('cart-items-container');
         const placeOrderBtn = document.getElementById('place-order-btn');
         const placeOrderWrapper = document.getElementById('place-order-wrapper');
+        const topProfileBtn = document.getElementById('top-right-profile-btn');
+        const bottomCartMenu = document.getElementById('bottom-cart-menu');
+        const bottomCartTotalSum = document.getElementById('bottom-cart-total-sum');
+        const cartPickupLocation = document.getElementById('cart-pickup-location');
+        const suggestedItemsList = document.getElementById('suggested-items-list');
+        const suggestedItemsSection = document.getElementById('suggested-items-section');
         
         const pickupModal = document.getElementById('pickup-modal');
-        const filterModal = document.getElementById('filter-modal');
         const storyModal = document.getElementById('story-modal');
         const orderFormModal = document.getElementById('order-form-modal');
         const confirmationModal = document.getElementById('confirmation-modal');
         const closePickupModalBtn = document.getElementById('close-modal-btn');
-        const closeFilterModalBtn = document.getElementById('close-filter-modal-btn');
         const closeStoryModalBtn = document.getElementById('close-story-modal-btn');
         const closeOrderFormBtn = document.getElementById('close-order-form-btn');
         const closeConfirmationBtn = document.getElementById('close-confirmation-btn');
@@ -388,52 +435,92 @@
         const storyProgressContainer = document.getElementById('story-progress-container');
         const prevStoryBtn = document.getElementById('prev-story-btn');
         const nextStoryBtn = document.getElementById('next-story-btn');
-        const messageBox = document.getElementById('message-box');
-        const messageText = document.getElementById('message-text');
-        const closeMessageButton = document.getElementById('close-message-button');
         const pickupLocations = document.getElementById('pickup-locations');
-        const applyFiltersBtn = document.getElementById('apply-filters-btn');
-        const clearFiltersBtn = document.getElementById('clear-filters-btn');
-        const minPriceInput = document.getElementById('min-price');
-        const maxPriceInput = document.getElementById('max-price');
-        const bottomCartSummary = document.getElementById('bottom-cart-summary');
-        const summaryTotal = document.getElementById('summary-total');
-        const summaryCheckoutBtn = document.getElementById('summary-checkout-btn');
         
-        // Новые элементы формы заказа
+        // Элементы формы заказа
         const orderForm = document.getElementById('order-form');
         const nameInput = document.getElementById('name');
         const phoneInput = document.getElementById('phone');
+        const orderPhoneValidationMsg = document.getElementById('order-phone-validation-message');
         const pickupTimeSelect = document.getElementById('pickup-time');
         const customTimeContainer = document.getElementById('custom-time-container');
         const customTimeInput = document.getElementById('custom-time');
-        const payButton = document.getElementById('pay-button');
         const confirmationText = document.getElementById('confirmation-text');
         
-        // Кнопки нижнего меню
-        const navMenuBtn = document.getElementById('nav-menu');
-        const navCartBtn = document.getElementById('nav-cart');
-        const navProfileBtn = document.getElementById('nav-profile');
-
+        // Элементы профиля
+        const profileNameInput = document.getElementById('profile-name');
+        const profilePhoneInput = document.getElementById('profile-phone');
+        const profilePhoneValidationMsg = document.getElementById('phone-validation-message');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const editProfileText = document.getElementById('edit-text');
+        const saveProfileText = document.getElementById('save-text');
+        const orderHistoryContainer = document.getElementById('order-history-container');
+        
         let currentStoryIndex = 0;
         let storyProgressInterval;
         let touchStartX = 0;
+        let isProfileEditing = false;
         
         const pickupAddresses = document.querySelectorAll('.pickup-location-btn');
-        const defaultPickupAddress = pickupAddresses[0];
+        let currentPickupLocation = "Москва, Тверская улица, 15";
+        
+        // Регулярное выражение для российской валидации номера телефона (+7 (XXX) XXX-XX-XX)
+        const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             renderStories();
             renderAllMenuItems();
             attachEventListeners();
-            // Показываем корректный вид при загрузке
             showView('menu');
-            // Применяем начальные стили для кнопок категорий
             updateCategoryButtons('burgers');
-            // Устанавливаем адрес по умолчанию
             setInitialPickupLocation();
         });
+        
+        /**
+         * Форматирует номер телефона в российский формат +7 (XXX) XXX-XX-XX
+         * @param {string} rawNumber Сырой номер (только цифры).
+         * @returns {string} Отформатированный номер.
+         */
+        function formatPhoneNumber(rawNumber) {
+            const digits = rawNumber.replace(/\D/g, '');
+            if (digits.length === 0) return '';
+            
+            let formatted = '+7';
+            if (digits.length > 0) {
+                formatted += ' (' + digits.substring(0, 3);
+            }
+            if (digits.length >= 4) {
+                formatted += ') ' + digits.substring(3, 6);
+            }
+            if (digits.length >= 7) {
+                formatted += '-' + digits.substring(6, 8);
+            }
+            if (digits.length >= 9) {
+                formatted += '-' + digits.substring(8, 10);
+            }
+            return formatted;
+        }
+        
+        /**
+         * Обработчик события input для форматирования номера телефона.
+         * @param {Event} e Событие input.
+         */
+        function handlePhoneInput(e) {
+            const input = e.target;
+            const rawValue = input.value.replace(/\D/g, '');
+            let start = input.selectionStart;
+            let oldLength = input.value.length;
+            
+            input.value = formatPhoneNumber(rawValue);
+            
+            // Корректировка позиции курсора
+            let newLength = input.value.length;
+            let diff = newLength - oldLength;
+            if (start !== null) {
+                input.setSelectionRange(start + diff, start + diff);
+            }
+        }
 
         // Слушатели событий
         function attachEventListeners() {
@@ -461,8 +548,9 @@
                     targetButton.classList.remove('bg-gray-800', 'hover:bg-gray-700');
                     targetButton.classList.add('bg-gray-700');
                     
-                    const selectedLocation = targetButton.dataset.locationName;
-                    pickupButton.querySelector('span').textContent = selectedLocation;
+                    currentPickupLocation = targetButton.dataset.locationName;
+                    pickupButton.querySelector('span').textContent = currentPickupLocation;
+                    cartPickupLocation.textContent = currentPickupLocation;
                     pickupModal.classList.add('modal-leave');
                     setTimeout(() => {
                         pickupModal.classList.add('hidden');
@@ -471,31 +559,7 @@
                 }
             });
 
-            filterButton.addEventListener('click', () => {
-                filterModal.classList.remove('hidden');
-                filterModal.classList.add('modal-enter');
-            });
-            closeFilterModalBtn.addEventListener('click', () => {
-                filterModal.classList.add('modal-leave');
-                setTimeout(() => {
-                    filterModal.classList.add('hidden');
-                    filterModal.classList.remove('modal-leave');
-                }, 300);
-            });
-
-            // Слушатели для фильтров
-            applyFiltersBtn.addEventListener('click', applyFilters);
-            clearFiltersBtn.addEventListener('click', clearFilters);
-
-            // Слушатель для поиска
-            searchInput.addEventListener('input', () => {
-                filterAndSearchMenu();
-            });
-
-            // Теперь кнопка "К оформлению" просто переключает на вид корзины
-            summaryCheckoutBtn.addEventListener('click', () => showView('cart'));
-
-            // Слушатель для новой кнопки "Оформить заказ"
+            // Слушатель для кнопки "Оформить заказ"
             placeOrderBtn.addEventListener('click', showOrderForm);
             
             // Слушатели для модальных окон
@@ -506,35 +570,6 @@
             // Навигация по историям
             prevStoryBtn.addEventListener('click', showPrevStory);
             nextStoryBtn.addEventListener('click', showNextStory);
-
-            // Обработка свайпов на модальном окне истории
-            storyModal.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].clientX;
-            });
-            storyModal.addEventListener('touchend', (e) => {
-                const touchEndX = e.changedTouches[0].clientX;
-                const deltaX = touchEndX - touchStartX;
-                const swipeThreshold = 50;
-                if (deltaX > swipeThreshold) {
-                    showPrevStory();
-                } else if (deltaX < -swipeThreshold) {
-                    showNextStory();
-                }
-            });
-
-            // Слушатели для нижнего меню
-            navMenuBtn.addEventListener('click', () => showView('menu'));
-            navCartBtn.addEventListener('click', () => showView('cart'));
-            navProfileBtn.addEventListener('click', () => showView('profile'));
-
-            // Слушатель для кнопок категорий
-            categoryTabs.addEventListener('click', (e) => {
-                const button = e.target.closest('.category-btn');
-                if (button) {
-                    const category = button.dataset.category;
-                    showCategory(category);
-                }
-            });
 
             // Слушатель для изменения времени самовывоза
             pickupTimeSelect.addEventListener('change', (e) => {
@@ -547,16 +582,192 @@
             
             // Слушатель для отправки формы заказа
             orderForm.addEventListener('submit', handleOrderSubmit);
+            
+            // Слушатель для редактирования профиля
+            editProfileBtn.addEventListener('click', toggleProfileEdit);
+            
+            // Слушатели для форматирования телефона
+            profilePhoneInput.addEventListener('input', handlePhoneInput);
+            phoneInput.addEventListener('input', handlePhoneInput);
+
+            // Новый слушатель для кнопки профиля в правом верхнем углу
+            topProfileBtn.addEventListener('click', () => showView('profile'));
+            
+            // Новый слушатель для нижней панели корзины
+            bottomCartMenu.addEventListener('click', () => showView('cart'));
+
+            // Слушатель для кнопок категорий
+            categoryTabs.addEventListener('click', (e) => {
+                const button = e.target.closest('.category-btn');
+                if (button) {
+                    const category = button.dataset.category;
+                    showCategory(category);
+                }
+            });
+        }
+        
+        /**
+         * Валидирует номер телефона по российскому формату.
+         * @param {string} phone Номер телефона для проверки.
+         * @returns {boolean} Результат валидации.
+         */
+        function validateRussianPhone(phone) {
+            return phoneRegex.test(phone);
+        }
+        
+        /**
+         * Переключает режим редактирования профиля.
+         */
+        function toggleProfileEdit() {
+            if (isProfileEditing) {
+                // Режим сохранения
+                const newName = profileNameInput.value.trim();
+                const newPhone = profilePhoneInput.value.trim();
+                
+                // Проверяем валидность телефона перед сохранением
+                if (!validateRussianPhone(newPhone)) {
+                    profilePhoneValidationMsg.classList.remove('hidden');
+                    return;
+                }
+                
+                profileNameInput.setAttribute('readonly', true);
+                profilePhoneInput.setAttribute('readonly', true);
+                editProfileText.classList.remove('hidden');
+                saveProfileText.classList.add('hidden');
+                isProfileEditing = false;
+                
+                // Сохраняем данные в localStorage
+                saveUserData(newName, newPhone);
+                
+            } else {
+                // Режим редактирования
+                profileNameInput.removeAttribute('readonly');
+                profilePhoneInput.removeAttribute('readonly');
+                editProfileText.classList.add('hidden');
+                saveProfileText.classList.remove('hidden');
+                isProfileEditing = true;
+                profilePhoneValidationMsg.classList.add('hidden');
+            }
         }
         
         /**
          * Устанавливает начальное место самовывоза.
          */
         function setInitialPickupLocation() {
-            if (defaultPickupAddress) {
-                const selectedLocation = defaultPickupAddress.dataset.locationName;
-                pickupButton.querySelector('span').textContent = selectedLocation;
+            if (pickupAddresses.length > 0) {
+                currentPickupLocation = pickupAddresses[0].dataset.locationName;
+                pickupButton.querySelector('span').textContent = currentPickupLocation;
+                cartPickupLocation.textContent = currentPickupLocation;
             }
+        }
+        
+        /**
+         * Загружает данные пользователя из localStorage.
+         * @returns {object|null} Объект с данными пользователя или null.
+         */
+        function loadUserData() {
+            const userData = localStorage.getItem('userData');
+            return userData ? JSON.parse(userData) : null;
+        }
+
+        /**
+         * Сохраняет данные пользователя в localStorage.
+         * @param {string} name Имя пользователя.
+         * @param {string} phone Номер телефона пользователя.
+         */
+        function saveUserData(name, phone) {
+            localStorage.setItem('userData', JSON.stringify({ name, phone }));
+        }
+        
+        /**
+         * Загружает историю заказов из localStorage.
+         * @returns {Array} Массив с историей заказов.
+         */
+        function loadOrderHistory() {
+            const history = localStorage.getItem('orderHistory');
+            return history ? JSON.parse(history) : [];
+        }
+        
+        /**
+         * Сохраняет историю заказов в localStorage.
+         * @param {Array} history Массив с историей заказов.
+         */
+        function saveOrderHistory(history) {
+            localStorage.setItem('orderHistory', JSON.stringify(history));
+        }
+        
+        /**
+         * Генерирует случайный 5-значный номер заказа.
+         * @returns {number} Случайный номер заказа.
+         */
+        function generateOrderNumber() {
+            return Math.floor(10000 + Math.random() * 90000);
+        }
+
+        /**
+         * Обновляет UI профиля на основе данных из localStorage.
+         */
+        function updateProfileUI() {
+            const userData = loadUserData();
+            if (userData) {
+                profileNameInput.value = userData.name || '';
+                profilePhoneInput.value = userData.phone || '';
+            } else {
+                profileNameInput.value = '';
+                profilePhoneInput.value = '';
+            }
+            renderOrderHistory();
+        }
+
+        /**
+         * Рендерит историю заказов.
+         */
+        function renderOrderHistory() {
+            const history = loadOrderHistory();
+            orderHistoryContainer.innerHTML = '';
+            if (history.length === 0) {
+                orderHistoryContainer.innerHTML = '<p class="text-gray-400 italic text-sm md:text-base text-center">У вас пока нет заказов.</p>';
+                return;
+            }
+
+            history.forEach(order => {
+                const itemsList = order.items.map(item => `
+                    <li class="flex justify-between items-center text-gray-400">
+                        <span>${item.name} (${item.quantity} шт)</span>
+                        <span>${item.price * item.quantity} ₽</span>
+                    </li>
+                `).join('');
+                
+                const orderCard = `
+                    <div class="bg-gray-800 p-3 rounded-xl shadow-md">
+                        <div class="flex justify-between items-center mb-2 font-bold text-sm">
+                            <span>Заказ № ${order.orderNumber}</span>
+                            <span>${order.total} ₽</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">
+                            <span>Место: ${order.location}</span> | <span>Дата: ${order.date}</span> | <span>Время: ${order.time}</span>
+                        </div>
+                        <ul class="space-y-1 text-sm md:text-base mb-4">
+                            ${itemsList}
+                        </ul>
+                        <!-- Прогресс-бар заказа -->
+                        <div class="order-status-bar">
+                            <div class="status-line left-0 w-1/2 completed"></div>
+                            <div class="status-line left-1/2 w-1/2"></div>
+                            <div class="status-step completed">
+                                <span class="status-label left-1/2 -translate-x-1/2">Принят</span>
+                            </div>
+                            <div class="status-step completed">
+                                <span class="status-label left-1/2 -translate-x-1/2">Готовится</span>
+                            </div>
+                            <div class="status-step completed">
+                                <span class="status-label left-1/2 -translate-x-1/2">Готов</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                orderHistoryContainer.innerHTML += orderCard;
+            });
         }
         
         /**
@@ -564,32 +775,18 @@
          * @param {string} viewName Имя вида ('menu', 'cart', 'profile').
          */
         function showView(viewName) {
-            const views = {
-                'menu': menuView,
-                'cart': cartView,
-                'profile': profileView
-            };
+            menuView.classList.add('hidden');
+            cartView.classList.add('hidden');
+            profileView.classList.add('hidden');
             
-            Object.values(views).forEach(view => view.classList.add('hidden'));
-            
-            if (views[viewName]) {
-                views[viewName].classList.remove('hidden');
-            }
-            
-            // Обновляем состояние кнопок навигации
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-white');
-                btn.classList.add('text-gray-200');
-            });
-            const navBtn = document.getElementById(`nav-${viewName}`);
-            if (navBtn) {
-                navBtn.classList.remove('text-gray-200');
-                navBtn.classList.add('text-white');
-            }
-            
-            // Если переключились на корзину, то рендерим ее содержимое
-            if (viewName === 'cart') {
+            if (viewName === 'menu') {
+                menuView.classList.remove('hidden');
+            } else if (viewName === 'cart') {
+                cartView.classList.remove('hidden');
                 renderCart();
+            } else if (viewName === 'profile') {
+                profileView.classList.remove('hidden');
+                updateProfileUI();
             }
         }
 
@@ -625,20 +822,9 @@
             storyModal.classList.remove('hidden');
             storyModal.classList.add('modal-enter');
             updateStoryIndicators();
+            
+            // Запускаем прогресс-бар
             startStoryProgress();
-            updateStoryNavigation();
-        }
-
-        /**
-         * Скрывает модальное окно истории.
-         */
-        function hideStoryModal() {
-            storyModal.classList.add('modal-leave');
-            clearInterval(storyProgressInterval);
-            setTimeout(() => {
-                storyModal.classList.add('hidden');
-                storyModal.classList.remove('modal-leave');
-            }, 300);
         }
         
         /**
@@ -647,6 +833,9 @@
          */
         function hideModal(modalElement) {
             modalElement.classList.add('modal-leave');
+            if (modalElement === storyModal) {
+                 clearInterval(storyProgressInterval);
+            }
             setTimeout(() => {
                 modalElement.classList.add('hidden');
                 modalElement.classList.remove('modal-leave');
@@ -654,53 +843,44 @@
         }
 
         /**
-         * Переходит к следующей истории.
+         * Запускает анимацию прогресса истории.
+         */
+        function startStoryProgress() {
+            clearInterval(storyProgressInterval);
+            const progressBar = document.querySelector(`#story-progress-container .progress-fill:nth-child(${currentStoryIndex + 1})`);
+            if (progressBar) {
+                 progressBar.style.transitionDuration = '5s';
+                 progressBar.style.width = '100%';
+            }
+            
+            storyProgressInterval = setTimeout(() => {
+                showNextStory();
+            }, 5000); // Переключаем историю через 5 секунд
+        }
+
+        /**
+         * Показывает следующую историю.
          */
         function showNextStory() {
-            clearInterval(storyProgressInterval);
             currentStoryIndex = (currentStoryIndex + 1) % storyData.length;
             showStory(currentStoryIndex);
         }
 
         /**
-         * Переходит к предыдущей истории.
+         * Показывает предыдущую историю.
          */
         function showPrevStory() {
-            clearInterval(storyProgressInterval);
             currentStoryIndex = (currentStoryIndex - 1 + storyData.length) % storyData.length;
             showStory(currentStoryIndex);
         }
-
-        /**
-         * Обновляет состояние кнопок навигации по историям.
-         */
-        function updateStoryNavigation() {
-            prevStoryBtn.classList.toggle('hidden', currentStoryIndex === 0);
-            nextStoryBtn.classList.toggle('hidden', currentStoryIndex === storyData.length - 1);
-        }
-
-        /**
-         * Запускает прогресс-бар для текущей истории.
-         */
-        function startStoryProgress() {
-            clearInterval(storyProgressInterval);
-            const progressBar = storyProgressContainer.children[currentStoryIndex]?.querySelector('.progress-fill');
-            if (progressBar) {
-                progressBar.style.width = '0%';
-                setTimeout(() => {
-                    progressBar.style.width = '100%';
-                }, 10);
-            }
-            storyProgressInterval = setTimeout(showNextStory, 5000); // 5 секунд на историю
-        }
-
+        
         /**
          * Обновляет индикаторы прогресса историй.
          */
         function updateStoryIndicators() {
             storyProgressContainer.innerHTML = storyData.map((_, index) => `
                 <div class="h-1 rounded-full bg-gray-600 flex-1">
-                    <div class="progress-fill h-full bg-white rounded-full transition-all ease-linear" style="width: ${index < currentStoryIndex ? '100%' : '0%'}; transition-duration: 5s;"></div>
+                    <div class="progress-fill h-full bg-white rounded-full transition-all ease-linear" style="width: ${index < currentStoryIndex ? '100%' : '0%'};"></div>
                 </div>
             `).join('');
         }
@@ -800,7 +980,7 @@
             if (item) {
                 cart.set(itemId, { ...item, quantity: 1 });
                 updateMenuItemControl(item);
-                updateBottomCartSummary();
+                updateBottomCartMenu();
             }
         }
 
@@ -825,9 +1005,9 @@
                 if (originalItem) {
                     updateMenuItemControl(originalItem);
                 }
-                updateBottomCartSummary();
+                updateBottomCartMenu();
                 // Если мы находимся на странице корзины, обновляем ее
-                if (document.getElementById('cart-view').classList.contains('hidden') === false) {
+                if (cartView.classList.contains('hidden') === false) {
                     renderCart();
                 }
             }
@@ -844,20 +1024,24 @@
             if (originalItem) {
                 updateMenuItemControl(originalItem);
             }
-            updateBottomCartSummary();
+            updateBottomCartMenu();
             renderCart();
+            // Если корзина пуста, автоматически закрываем её
+            if (cart.size === 0) {
+                showView('menu');
+            }
         }
 
         /**
-         * Обновляет нижнюю кнопку с итоговой суммой.
+         * Обновляет видимость и сумму в нижней панели корзины.
          */
-        function updateBottomCartSummary() {
-            const total = Array.from(cart.values()).reduce((sum, item) => sum + item.price * item.quantity, 0);
-            if (total > 0) {
-                summaryTotal.textContent = `${total} ₽`;
-                bottomCartSummary.classList.remove('hidden');
+        function updateBottomCartMenu() {
+            if (cart.size > 0) {
+                const total = Array.from(cart.values()).reduce((sum, item) => sum + item.price * item.quantity, 0);
+                bottomCartTotalSum.textContent = `${total} ₽`;
+                bottomCartMenu.classList.add('visible');
             } else {
-                bottomCartSummary.classList.add('hidden');
+                bottomCartMenu.classList.remove('visible');
             }
         }
         
@@ -870,6 +1054,7 @@
             if (cart.size === 0) {
                 cartItemsContainer.innerHTML = '<p id="empty-cart-message" class="text-gray-400 italic text-sm md:text-base text-center py-8">Ваша корзина пуста.</p>';
                 placeOrderWrapper.classList.add('hidden');
+                suggestedItemsSection.classList.add('hidden');
             } else {
                 placeOrderWrapper.classList.remove('hidden');
                 
@@ -892,6 +1077,9 @@
                     `;
                     cartItemsContainer.innerHTML += cartItemHtml;
                 });
+                
+                // Рендерим предложенные товары
+                renderSuggestedItems();
             }
             
             // Добавляем слушателей событий к кнопкам корзины
@@ -902,14 +1090,51 @@
                 button.addEventListener('click', removeFromCart);
             });
         }
+        
+        /**
+         * Рендерит предложенные товары.
+         */
+        function renderSuggestedItems() {
+            const cartItemIds = Array.from(cart.keys());
+            const suggestedItems = allMenuItems.filter(item => !cartItemIds.includes(item.id));
+            
+            if (suggestedItems.length > 0) {
+                suggestedItemsSection.classList.remove('hidden');
+                suggestedItemsList.innerHTML = suggestedItems.slice(0, 4).map(item => `
+                    <div class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
+                        <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-full mb-2 object-cover">
+                        <h3 class="font-bold text-sm">${item.name}</h3>
+                        <p class="text-xs text-gray-400 my-1">${item.price} ₽</p>
+                        <button class="add-to-cart-btn mt-2 bg-[#AB3031] text-white rounded-xl py-2 px-4 w-full text-xs transition-colors duration-300 hover:bg-[#972C2C]"
+                                data-id="${item.id}">
+                            Добавить
+                        </button>
+                    </div>
+                `).join('');
 
+                document.querySelectorAll('#suggested-items-list .add-to-cart-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        addToCart(e);
+                        // После добавления из предложений, обновляем и саму корзину
+                        renderCart(); 
+                    });
+                });
+            } else {
+                suggestedItemsSection.classList.add('hidden');
+            }
+        }
+        
         /**
          * Показывает модальное окно с формой заказа.
          */
         function showOrderForm() {
             if (cart.size === 0) {
-                 // В случае пустой корзины просто ничего не делаем или показываем сообщение
                  return;
+            }
+            const userData = loadUserData();
+            if (userData) {
+                nameInput.value = userData.name || '';
+                phoneInput.value = userData.phone || '';
             }
             orderFormModal.classList.remove('hidden');
             orderFormModal.classList.add('modal-enter');
@@ -920,23 +1145,45 @@
          * @param {Event} event Объект события.
          */
         function handleOrderSubmit(event) {
-            event.preventDefault(); // Предотвращаем стандартную отправку формы
+            event.preventDefault();
 
             const name = nameInput.value.trim();
             const phone = phoneInput.value.trim();
-            const pickupTime = pickupTimeSelect.value;
             
             // Простая валидация
             if (!name || !phone) {
-                // Вместо alert()
-                showCustomMessage('Пожалуйста, заполните все поля!');
                 return;
             }
+            
+            // Валидация российского номера телефона
+            if (!validateRussianPhone(phone)) {
+                orderPhoneValidationMsg.classList.remove('hidden');
+                return;
+            }
+            
+            orderPhoneValidationMsg.classList.add('hidden');
 
             // Имитация "оплаты" и "оформления"
             hideModal(orderFormModal);
             
             const total = Array.from(cart.values()).reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            // Сохраняем данные пользователя
+            saveUserData(name, phone);
+            
+            // Сохраняем историю заказа
+            const orderHistory = loadOrderHistory();
+            const now = new Date();
+            const orderDetails = {
+                orderNumber: generateOrderNumber(),
+                location: currentPickupLocation,
+                date: now.toLocaleDateString('ru-RU'),
+                time: now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                items: Array.from(cart.values()),
+                total: total
+            };
+            orderHistory.push(orderDetails);
+            saveOrderHistory(orderHistory);
 
             confirmationText.textContent = `Ваш заказ на сумму ${total} ₽ успешно оформлен! По готовности вам придет уведомление в Telegram.`;
             confirmationModal.classList.remove('hidden');
@@ -944,7 +1191,7 @@
 
             // Очищаем корзину и обновляем UI
             cart.clear();
-            updateBottomCartSummary();
+            updateBottomCartMenu();
             // Возвращаемся на страницу меню, но с небольшой задержкой для плавности
             setTimeout(() => {
                 showView('menu');
@@ -963,7 +1210,6 @@
             });
             document.getElementById(`${category}-section`).classList.remove('hidden');
             document.getElementById('no-results').classList.add('hidden');
-            searchInput.value = ''; // Очищаем поле поиска
             updateCategoryButtons(category);
         }
 
@@ -981,99 +1227,6 @@
                     btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
                 }
             });
-        }
-
-
-        /**
-         * Применяет фильтры по цене.
-         */
-        function applyFilters() {
-            const minPrice = parseInt(minPriceInput.value) || 0;
-            const maxPrice = parseInt(maxPriceInput.value) || Infinity;
-            
-            const filteredItems = allMenuItems.filter(item =>
-                item.price >= minPrice && item.price <= maxPrice
-            );
-
-            renderFilteredItems(filteredItems);
-            filterModal.classList.add('modal-leave');
-            setTimeout(() => {
-                filterModal.classList.add('hidden');
-                filterModal.classList.remove('modal-leave');
-            }, 300);
-        }
-
-        /**
-         * Сбрасывает фильтры и показывает все меню.
-         */
-        function clearFilters() {
-            minPriceInput.value = '';
-            maxPriceInput.value = '';
-            showCategory('burgers');
-            filterModal.classList.add('modal-leave');
-            setTimeout(() => {
-                filterModal.classList.add('hidden');
-                filterModal.classList.remove('modal-leave');
-            }, 300);
-        }
-
-        /**
-         * Фильтрует и ищет элементы меню.
-         */
-        function filterAndSearchMenu() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const minPrice = parseInt(minPriceInput.value) || 0;
-            const maxPrice = parseInt(maxPriceInput.value) || Infinity;
-
-            const filteredAndSearchedItems = allMenuItems.filter(item =>
-                item.name.toLowerCase().includes(searchTerm) &&
-                item.price >= minPrice && item.price <= maxPrice
-            );
-            
-            renderFilteredItems(filteredAndSearchedItems);
-        }
-
-        /**
-         * Рендерит отфильтрованные элементы в указанном контейнере.
-         */
-        function renderFilteredItems(items) {
-            // Скрываем все секции
-            document.querySelectorAll('.category-section').forEach(section => section.classList.add('hidden'));
-            
-            const groupedItems = items.reduce((acc, item) => {
-                (acc[item.category] = acc[item.category] || []).push(item);
-                return acc;
-            }, {});
-
-            if (items.length > 0) {
-                document.getElementById('no-results').classList.add('hidden');
-                // Рендерим только те категории, которые соответствуют фильтру/поиску
-                Object.keys(groupedItems).forEach(category => {
-                    const section = document.getElementById(`${category}-section`);
-                    const listContainer = document.getElementById(`${category}-list`);
-                    if (section && listContainer) {
-                        section.classList.remove('hidden');
-                        listContainer.innerHTML = ''; // Очищаем старые элементы
-                        groupedItems[category].forEach(item => {
-                             listContainer.innerHTML += `
-                                <div id="item-${item.id}" class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
-                                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-2 object-cover">
-                                    <h3 class="font-bold text-sm sm:text-base">${item.name}</h3>
-                                    <p class="text-xs sm:text-sm text-gray-400 my-1">${item.price} ₽</p>
-                                    <div id="item-control-${item.id}" class="w-full">
-                                        ${createItemControlHtml(item)}
-                                    </div>
-                                </div>
-                            `;
-                        });
-                    }
-                });
-                updateCategoryButtons(''); // Сбрасываем выделение категорий
-                
-            } else {
-                document.getElementById('no-results').classList.remove('hidden');
-            }
-            attachMenuItemEventListeners(); // Переприкрепляем слушатели после рендера
         }
     </script>
 </body>
