@@ -37,6 +37,34 @@
             from { width: 0; }
             to { width: 100%; }
         }
+
+        /* Дополнительные стили для мобильных устройств */
+        #app {
+            width: 100%;
+        }
+
+        @media (max-width: 1023px) {
+            body {
+                align-items: flex-start;
+            }
+            #app {
+                flex-direction: column;
+                max-width: none;
+                padding: 10px;
+                margin: 0;
+            }
+            main {
+                width: 100%;
+            }
+            aside {
+                width: 100%;
+                margin-top: 20px;
+            }
+            .menu-container {
+                height: auto;
+                max-height: 50vh; /* Ограничиваем высоту для скроллинга на мобильных */
+            }
+        }
     </style>
 </head>
 <body class="p-2 sm:p-4 md:p-8">
@@ -231,7 +259,6 @@
                 { id: 'drink_2', name: 'Латте', price: 180, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Латте' }
             ]
         };
-
         // Данные для историй
         const stories = [
             { id: 'story_1', image: 'https://placehold.co/400x600/3A243F/ffffff?text=Новое\nменю' },
@@ -246,7 +273,7 @@
         let activeFilters = { minPrice: null, maxPrice: null };
         let storyTimeout = null;
         let currentStoryIndex = 0;
-        let touchStartX = 0;
+        let touchStartX = 0; // Переменная для отслеживания начала касания
 
         // Элементы DOM
         const menuLists = {
@@ -262,319 +289,226 @@
         const cartTotalSpan = document.getElementById('cart-total');
         const checkoutButton = document.getElementById('checkout-button');
         const emptyCartMessage = document.getElementById('empty-cart-message');
-        const messageBox = document.getElementById('message-box');
-        const messageText = document.getElementById('message-text');
-        const closeMessageButton = document.getElementById('close-message-button');
-        const pickupButton = document.getElementById('pickup-button');
-        const pickupModal = document.getElementById('pickup-modal');
-        const closePickupModalBtn = document.getElementById('close-modal-btn');
-        const cancelPickupBtn = document.getElementById('cancel-pickup-btn');
         const searchInput = document.getElementById('search-input');
         const noResultsMessage = document.getElementById('no-results');
+
+        // Модальное окно самовывоза
+        const pickupButton = document.getElementById('pickup-button');
+        const pickupModal = document.getElementById('pickup-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelPickupBtn = document.getElementById('cancel-pickup-btn');
+
+        // Модальное окно фильтров
         const filterButton = document.getElementById('filter-button');
         const filterModal = document.getElementById('filter-modal');
         const closeFilterModalBtn = document.getElementById('close-filter-modal-btn');
-        const applyFiltersBtn = document.getElementById('apply-filters-btn');
         const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        const applyFiltersBtn = document.getElementById('apply-filters-btn');
         const minPriceInput = document.getElementById('min-price');
         const maxPriceInput = document.getElementById('max-price');
+
+        // Модальное окно историй
         const storyContainer = document.getElementById('story-container');
         const storyModal = document.getElementById('story-modal');
+        const closeStoryModalBtn = document.getElementById('close-story-modal-btn');
         const storyImage = document.getElementById('story-image');
         const storyProgressContainer = document.getElementById('story-progress-container');
-        const closeStoryModalBtn = document.getElementById('close-story-modal-btn');
+
+        // Модальное окно с сообщением
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const closeMessageBoxButton = document.getElementById('close-message-button');
+
+        // Функции
         
-        // Функция для отображения карточки одного элемента меню
-        function renderMenuItem(item) {
-            return `
-                <div class="bg-[#241E1B] rounded-2xl shadow-md overflow-hidden flex flex-col transform hover:scale-105 transition-transform duration-300">
-                    <img src="${item.image}" alt="${item.name}" class="w-full aspect-square object-cover">
-                    <div class="p-4 flex flex-col flex-grow">
-                        <h3 class="font-semibold text-sm md:text-base lg:text-lg mb-1 text-white">${item.name}</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">${item.price} ₽</p>
-                        <button data-id="${item.id}" class="add-to-cart-btn w-full mt-auto bg-[#AB3031] text-white py-2 px-4 rounded-xl font-bold hover:bg-[#972C2C] transition-colors text-sm md:text-base">
-                            Добавить
-                        </button>
+        // Показывает диалоговое окно вместо alert()
+        function showMessageBox(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        // Рендеринг элементов меню
+        function renderMenuItems(items, container, category) {
+            container.innerHTML = '';
+            items.forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = `bg-gray-800 rounded-xl p-3 flex flex-col items-center text-center transition-transform transform hover:scale-105 relative cursor-pointer group`;
+                itemElement.innerHTML = `
+                    <div class="relative w-full aspect-square mb-2 overflow-hidden rounded-xl">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover rounded-xl">
                     </div>
-                </div>
-            `;
-        }
-
-        // Функция для отображения элементов историй
-        function renderStories() {
-            storyContainer.innerHTML = stories.map(story => `
-                <div data-id="${story.id}" class="story-item flex-shrink-0 w-20 sm:w-24 aspect-[9/16] bg-gray-600 rounded-xl border-2 border-[#AB3031] overflow-hidden cursor-pointer">
-                    <img src="${story.image}" alt="Story" class="w-full h-full object-cover">
-                </div>
-            `).join('');
-        }
-        
-        // Отображение элементов меню для конкретной категории
-        function renderCategory(category, items) {
-            const listElement = menuLists[category];
-            const sectionElement = listElement ? listElement.parentNode : null;
-
-            if (listElement && sectionElement) {
-                if (items.length > 0) {
-                    listElement.innerHTML = items.map(renderMenuItem).join('');
-                    sectionElement.classList.remove('hidden');
-                } else {
-                    sectionElement.classList.add('hidden');
-                }
-            }
-        }
-
-        // Основная функция для фильтрации, поиска и отображения меню
-        function filterAndSearchMenu() {
-            const query = searchInput.value.toLowerCase().trim();
-            const minPrice = parseInt(minPriceInput.value, 10);
-            const maxPrice = parseInt(maxPriceInput.value, 10);
-
-            // Скрываем или показываем секцию категорий в зависимости от наличия поиска/фильтров
-            if (query || activeFilters.minPrice || activeFilters.maxPrice) {
-                categorySection.classList.add('hidden');
-            } else {
-                categorySection.classList.remove('hidden');
-            }
-
-            const allItems = Object.values(menuItems).flat();
-            let filteredItems = allItems;
-
-            if (query) {
-                filteredItems = filteredItems.filter(item =>
-                    item.name.toLowerCase().includes(query)
-                );
-            }
-
-            if (!isNaN(minPrice)) {
-                filteredItems = filteredItems.filter(item => item.price >= minPrice);
-            }
-            if (!isNaN(maxPrice)) {
-                filteredItems = filteredItems.filter(item => item.price <= maxPrice);
-            }
-
-            // Скрываем все секции меню перед отображением отфильтрованных результатов
-            Object.values(menuLists).forEach(list => {
-                if (list) {
-                    list.innerHTML = '';
-                    list.parentNode.classList.add('hidden');
-                }
+                    <div class="flex-grow flex flex-col justify-end">
+                        <h3 class="text-sm font-semibold text-white truncate w-full mb-1">${item.name}</h3>
+                        <p class="text-sm font-bold text-[#AB3031]">${item.price} ₽</p>
+                    </div>
+                    <button class="add-to-cart-btn absolute bottom-3 right-3 bg-[#AB3031] text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform active:scale-95" data-id="${item.id}" data-category="${category}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </button>
+                `;
+                container.appendChild(itemElement);
             });
-            noResultsMessage.classList.add('hidden');
-
-            if (filteredItems.length > 0) {
-                // Группируем отфильтрованные элементы по категориям
-                const groupedItems = {};
-                filteredItems.forEach(item => {
-                    for (const category in menuItems) {
-                        if (menuItems[category].find(i => i.id === item.id)) {
-                            if (!groupedItems[category]) {
-                                groupedItems[category] = [];
-                            }
-                            groupedItems[category].push(item);
-                            break;
-                        }
-                    }
-                });
-
-                // Отображаем только те категории, в которых есть отфильтрованные элементы
-                for (const category in groupedItems) {
-                    renderCategory(category, groupedItems[category]);
-                }
-            } else {
-                noResultsMessage.classList.remove('hidden');
-            }
         }
 
-        // Функция для поиска элемента по ID
+        // Рендеринг корзины
+        function renderCart() {
+            cartContainer.innerHTML = '';
+            let total = 0;
+            const hasItems = Object.keys(cart).length > 0;
+
+            if (!hasItems) {
+                emptyCartMessage.classList.remove('hidden');
+                checkoutButton.disabled = true;
+                cartTotalSpan.textContent = '0 ₽';
+                return;
+            } else {
+                emptyCartMessage.classList.add('hidden');
+                checkoutButton.disabled = false;
+            }
+            
+            for (const itemId in cart) {
+                const quantity = cart[itemId];
+                const item = findItemById(itemId);
+
+                if (item) {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = `cart-item flex items-center justify-between bg-gray-700 p-3 rounded-xl mb-2`;
+                    const itemTotal = item.price * quantity;
+                    total += itemTotal;
+                    itemElement.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded-md">
+                            <div>
+                                <h4 class="text-white text-sm font-medium">${item.name}</h4>
+                                <p class="text-gray-300 text-xs">${item.price} ₽</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center bg-gray-600 rounded-full p-1">
+                                <button class="decrement-quantity-btn text-white p-1 rounded-full hover:bg-gray-500 transition-colors" data-id="${item.id}">-</button>
+                                <span class="text-white font-semibold text-sm px-2">${quantity}</span>
+                                <button class="increment-quantity-btn text-white p-1 rounded-full hover:bg-gray-500 transition-colors" data-id="${item.id}">+</button>
+                            </div>
+                            <span class="text-[#AB3031] font-bold text-sm min-w-[50px] text-right">${itemTotal} ₽</span>
+                        </div>
+                    `;
+                    cartContainer.appendChild(itemElement);
+                }
+            }
+            cartTotalSpan.textContent = `${total} ₽`;
+        }
+
+        // Поиск элемента по ID
         function findItemById(id) {
             for (const category in menuItems) {
-                const item = menuItems[category].find(i => i.id === id);
-                if (item) return item;
+                const found = menuItems[category].find(item => item.id === id);
+                if (found) {
+                    return found;
+                }
             }
             return null;
         }
 
-        // Функция для обновления отображения корзины
-        function updateCart() {
-            cartContainer.innerHTML = '';
-            let total = 0;
-            const itemsInCart = Object.keys(cart).filter(id => cart[id] > 0);
-
-            if (itemsInCart.length === 0) {
-                emptyCartMessage.classList.remove('hidden');
-                checkoutButton.disabled = true;
-                checkoutButton.classList.add('opacity-50');
-            } else {
-                emptyCartMessage.classList.add('hidden');
-                checkoutButton.disabled = false;
-                checkoutButton.classList.remove('opacity-50');
-                
-                itemsInCart.forEach(itemId => {
-                    const quantity = cart[itemId];
-                    const itemData = findItemById(itemId);
-                    if (!itemData) return;
-
-                    const itemTotal = itemData.price * quantity;
-                    total += itemTotal;
-
-                    const cartItemElement = document.createElement('div');
-                    cartItemElement.className = 'flex items-center justify-between p-3 bg-gray-800 rounded-xl shadow-sm';
-                    cartItemElement.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <img src="${itemData.image}" alt="${itemData.name}" class="w-12 h-12 rounded-lg object-cover">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-medium text-sm md:text-base text-white truncate">${itemData.name}</h4>
-                                <p class="text-xs text-gray-400">${itemData.price} ₽/шт</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-1 text-base font-semibold">
-                            <button data-id="${itemData.id}" class="quantity-btn decrease-btn w-6 h-6 flex items-center justify-center rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-colors active:scale-95 leading-none">-</button>
-                            <span class="w-5 text-center text-xs font-medium text-white">${quantity}</span>
-                            <button data-id="${itemData.id}" class="quantity-btn increase-btn w-6 h-6 flex items-center justify-center rounded-full bg-[#E54848] text-white hover:bg-[#C93F3F] transition-colors active:scale-95 leading-none">+</button>
-                        </div>
-                    `;
-                    cartContainer.appendChild(cartItemElement);
-                });
-            }
-
-            cartTotalSpan.textContent = `${total} ₽`;
-        }
-
-        // Функционал историй
-        function openStoryModal(index) {
-            currentStoryIndex = index;
-            storyModal.classList.remove('hidden');
-            updateStoryModal();
-        }
-
-        function updateStoryModal() {
-            if (storyTimeout) {
-                clearTimeout(storyTimeout);
-            }
-
-            const story = stories[currentStoryIndex];
-            storyImage.src = story.image;
-            
-            // Динамически создаем сегменты прогресс-бара
-            storyProgressContainer.innerHTML = stories.map((_, i) => `
-                <div class="flex-grow h-1 bg-gray-600 rounded-full overflow-hidden">
-                    <div id="progress-${i}" class="h-full bg-white ${i === currentStoryIndex ? 'progress-bar' : ''}" style="width: ${i < currentStoryIndex ? '100%' : '0%'};"></div>
-                </div>
-            `).join('');
-
-            // Таймер для автоматического переключения
-            storyTimeout = setTimeout(() => {
-                showNextStory();
-            }, 10000); // 10 секунд
-        }
-
-        function showNextStory() {
-            currentStoryIndex = (currentStoryIndex + 1) % stories.length;
-            updateStoryModal();
-        }
-        
-        function showPrevStory() {
-            currentStoryIndex = (currentStoryIndex - 1 + stories.length) % stories.length;
-            updateStoryModal();
-        }
-
-        function closeStoryModal() {
-            storyModal.classList.add('hidden');
-            if (storyTimeout) {
-                clearTimeout(storyTimeout);
-                storyTimeout = null;
-            }
-        }
-
-        // --- Обработчики событий ---
-
-        document.body.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-to-cart-btn')) {
-                const itemId = e.target.dataset.id;
-                cart[itemId] = (cart[itemId] || 0) + 1;
-                updateCart();
-            }
-            if (e.target.closest('.story-item')) {
-                const storyId = e.target.closest('.story-item').dataset.id;
-                const index = stories.findIndex(s => s.id === storyId);
-                if (index !== -1) {
-                    openStoryModal(index);
-                }
-            }
-        });
-
-        cartContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('quantity-btn')) {
-                const itemId = e.target.dataset.id;
-                if (e.target.classList.contains('increase-btn')) {
+        // Обработка кликов
+        document.body.addEventListener('click', e => {
+            // Добавление в корзину
+            if (e.target.closest('.add-to-cart-btn')) {
+                const btn = e.target.closest('.add-to-cart-btn');
+                const itemId = btn.dataset.id;
+                if (cart[itemId]) {
                     cart[itemId]++;
-                } else if (e.target.classList.contains('decrease-btn')) {
-                    if (cart[itemId] > 1) {
-                        cart[itemId]--;
-                    } else {
-                        delete cart[itemId];
-                    }
+                } else {
+                    cart[itemId] = 1;
                 }
-                updateCart();
+                renderCart();
+            }
+
+            // Увеличение количества
+            if (e.target.closest('.increment-quantity-btn')) {
+                const btn = e.target.closest('.increment-quantity-btn');
+                const itemId = btn.dataset.id;
+                if (cart[itemId]) {
+                    cart[itemId]++;
+                }
+                renderCart();
+            }
+
+            // Уменьшение количества
+            if (e.target.closest('.decrement-quantity-btn')) {
+                const btn = e.target.closest('.decrement-quantity-btn');
+                const itemId = btn.dataset.id;
+                if (cart[itemId] && cart[itemId] > 1) {
+                    cart[itemId]--;
+                } else {
+                    delete cart[itemId];
+                }
+                renderCart();
             }
         });
 
+        // Обработка заказа
         checkoutButton.addEventListener('click', () => {
-            if (Object.keys(cart).length === 0) return;
-
-            const orderDetails = Object.keys(cart).map(id => {
-                const item = findItemById(id);
-                return {
-                    name: item.name,
-                    quantity: cart[id],
-                    price: item.price
-                };
-            });
-            const total = orderDetails.reduce((sum, item) => sum + item.quantity * item.price, 0);
-
-            let orderSummary = orderDetails.map(item => `${item.name}: ${item.quantity} шт.`).join(', ');
-            messageText.textContent = `Ваш заказ: ${orderSummary}. Общая стоимость: ${total} ₽. Мы свяжемся с вами в ближайшее время!`;
-            
-            messageBox.classList.remove('hidden');
+            if (Object.keys(cart).length === 0) {
+                showMessageBox("Ваша корзина пуста. Добавьте товары, чтобы оформить заказ.");
+            } else {
+                showMessageBox("Ваш заказ успешно оформлен! Ожидайте подтверждения.");
+            }
         });
 
-        closeMessageButton.addEventListener('click', () => {
+        // Закрытие модального окна с сообщением
+        closeMessageBoxButton.addEventListener('click', () => {
             messageBox.classList.add('hidden');
-            cart = {}; // Очищаем корзину после заказа
-            updateCart();
         });
 
-        pickupButton.addEventListener('click', () => {
-            pickupModal.classList.remove('hidden');
-        });
-
-        closePickupModalBtn.addEventListener('click', () => {
-            pickupModal.classList.add('hidden');
-        });
-        cancelPickupBtn.addEventListener('click', () => {
-            pickupModal.classList.add('hidden');
-        });
-
-        document.querySelectorAll('.pickup-location-btn').forEach(btn => {
+        // Обработка кнопок категорий
+        categoryButtons.forEach(btn => {
             btn.addEventListener('click', () => {
-                currentPickupLocation = btn.querySelector('h4').textContent;
-                pickupButton.querySelector('span').textContent = currentPickupLocation;
-                pickupModal.classList.add('hidden');
+                const category = btn.dataset.category;
+                showCategory(category);
             });
         });
 
-        filterButton.addEventListener('click', () => {
-            filterModal.classList.remove('hidden');
-        });
+        // Поиск и фильтрация
+        function filterAndSearchMenu() {
+            const searchQuery = searchInput.value.toLowerCase();
+            const minPrice = activeFilters.minPrice;
+            const maxPrice = activeFilters.maxPrice;
 
-        closeFilterModalBtn.addEventListener('click', () => {
-            filterModal.classList.add('hidden');
-        });
+            let foundCount = 0;
+            // Проходим по всем категориям
+            for (const category in menuItems) {
+                const container = menuLists[category];
+                if (!container) continue;
 
+                const filteredItems = menuItems[category].filter(item => {
+                    const nameMatches = item.name.toLowerCase().includes(searchQuery);
+                    const priceMatches = (!minPrice || item.price >= minPrice) && (!maxPrice || item.price <= maxPrice);
+                    return nameMatches && priceMatches;
+                });
+                
+                // Скрываем или показываем секцию, если есть результаты
+                const section = document.getElementById(`${category}-section`);
+                if (filteredItems.length > 0) {
+                    section.classList.remove('hidden');
+                    renderMenuItems(filteredItems, container, category);
+                    foundCount++;
+                } else {
+                    section.classList.add('hidden');
+                }
+            }
+
+            if (foundCount === 0) {
+                noResultsMessage.classList.remove('hidden');
+            } else {
+                noResultsMessage.classList.add('hidden');
+            }
+        }
+
+        searchInput.addEventListener('input', filterAndSearchMenu);
         applyFiltersBtn.addEventListener('click', () => {
-            activeFilters.minPrice = parseInt(minPriceInput.value, 10);
-            activeFilters.maxPrice = parseInt(maxPriceInput.value, 10);
+            activeFilters.minPrice = parseFloat(minPriceInput.value) || null;
+            activeFilters.maxPrice = parseFloat(maxPriceInput.value) || null;
             filterAndSearchMenu();
             filterModal.classList.add('hidden');
         });
@@ -587,44 +521,109 @@
             filterAndSearchMenu();
         });
 
-        searchInput.addEventListener('input', () => {
-            filterAndSearchMenu();
-        });
+        // Управление модальными окнами
+        pickupButton.addEventListener('click', () => pickupModal.classList.remove('hidden'));
+        closeModalBtn.addEventListener('click', () => pickupModal.classList.add('hidden'));
+        cancelPickupBtn.addEventListener('click', () => pickupModal.classList.add('hidden'));
 
-        document.getElementById('category-tabs').addEventListener('click', (e) => {
-            if (e.target.classList.contains('category-btn')) {
-                searchInput.value = '';
-                minPriceInput.value = '';
-                maxPriceInput.value = '';
-                activeFilters.minPrice = null;
-                activeFilters.maxPrice = null;
-                
-                const category = e.target.dataset.category;
-                showCategory(category);
+        filterButton.addEventListener('click', () => filterModal.classList.remove('hidden'));
+        closeFilterModalBtn.addEventListener('click', () => filterModal.classList.add('hidden'));
+
+        // Рендеринг историй
+        function renderStories() {
+            storyContainer.innerHTML = '';
+            stories.forEach((story, index) => {
+                const storyElement = document.createElement('div');
+                storyElement.className = `flex-shrink-0 w-20 sm:w-24 md:w-28 cursor-pointer relative`;
+                storyElement.innerHTML = `
+                    <img src="${story.image}" alt="Story ${index + 1}" class="w-full h-auto rounded-full border-2 border-[#AB3031] aspect-square object-cover">
+                    <p class="text-center text-xs sm:text-sm mt-1 text-gray-400">Story ${index + 1}</p>
+                `;
+                storyElement.addEventListener('click', () => showStory(index));
+                storyContainer.appendChild(storyElement);
+            });
+        }
+
+        function showStory(index) {
+            currentStoryIndex = index;
+            storyImage.src = stories[currentStoryIndex].image;
+            storyModal.classList.remove('hidden');
+            
+            renderStoryProgress();
+            startStoryTimeout();
+        }
+
+        function renderStoryProgress() {
+            storyProgressContainer.innerHTML = '';
+            stories.forEach((_, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'progress-bar-segment flex-grow h-1 bg-gray-500 rounded-full relative overflow-hidden';
+                if (index < currentStoryIndex) {
+                    bar.innerHTML = `<div class="w-full h-full bg-white"></div>`;
+                } else if (index === currentStoryIndex) {
+                    bar.innerHTML = `<div class="w-0 h-full bg-white animate-progress"></div>`;
+                }
+                storyProgressContainer.appendChild(bar);
+            });
+        }
+
+        // Анимация прогресс-бара
+        document.styleSheets[0].insertRule(`
+            @keyframes progress-fill {
+                from { width: 0; }
+                to { width: 100%; }
             }
+        `);
+        document.styleSheets[0].insertRule(`
+            .animate-progress {
+                animation: progress-fill 5s linear forwards;
+            }
+        `);
+
+        function startStoryTimeout() {
+            clearTimeout(storyTimeout);
+            storyTimeout = setTimeout(() => {
+                showNextStory();
+            }, 5000); // Показываем каждую историю 5 секунд
+        }
+
+        function showNextStory() {
+            currentStoryIndex++;
+            if (currentStoryIndex < stories.length) {
+                showStory(currentStoryIndex);
+            } else {
+                storyModal.classList.add('hidden');
+                clearTimeout(storyTimeout);
+            }
+        }
+
+        function showPrevStory() {
+            currentStoryIndex--;
+            if (currentStoryIndex >= 0) {
+                showStory(currentStoryIndex);
+            } else {
+                currentStoryIndex = 0; // Остаемся на первой истории
+            }
+        }
+
+        closeStoryModalBtn.addEventListener('click', () => {
+            storyModal.classList.add('hidden');
+            clearTimeout(storyTimeout);
         });
-        
-        // Обработчик для закрытия модального окна истории
-        closeStoryModalBtn.addEventListener('click', closeStoryModal);
 
-        // Обработчики для свайпов
-        storyModal.addEventListener('touchstart', (e) => {
-            // Запоминаем начальную точку касания
-            touchStartX = e.touches[0].clientX;
-        }, { passive: true }); // passive: true улучшает производительность прокрутки
+        // Управление свайпами
+        storyModal.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].clientX;
+        });
 
-        storyModal.addEventListener('touchend', (e) => {
-            // Определяем конечную точку касания
+        storyModal.addEventListener('touchend', e => {
             const touchEndX = e.changedTouches[0].clientX;
-            // Рассчитываем разницу
             const deltaX = touchEndX - touchStartX;
             const swipeThreshold = 50; // Минимальное расстояние для свайпа
 
             if (deltaX > swipeThreshold) {
-                // Свайп вправо
                 showPrevStory();
             } else if (deltaX < -swipeThreshold) {
-                // Свайп влево
                 showNextStory();
             }
         });
@@ -646,12 +645,18 @@
                 }
             });
         }
-        
-        renderStories();
-        filterAndSearchMenu();
-        updateCart();
-        showCategory('burgers');
 
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMenuItems(menuItems.burgers, menuLists.burgers, 'burgers');
+            renderMenuItems(menuItems.pizza, menuLists.pizza, 'pizza');
+            renderMenuItems(menuItems.snacks, menuLists.snacks, 'snacks');
+            renderMenuItems(menuItems.drinks, menuLists.drinks, 'drinks');
+            renderCart();
+            renderStories();
+            filterAndSearchMenu();
+            showCategory('burgers');
+        });
     </script>
 </body>
 </html>
