@@ -33,11 +33,6 @@
         .progress-bar {
             animation: progress-fill 10s linear forwards;
         }
-        @keyframes progress-fill {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
         /* Дополнительные стили для мобильных устройств */
         #app {
             width: 100%;
@@ -567,19 +562,6 @@
             });
         }
 
-        // Анимация прогресс-бара
-        document.styleSheets[0].insertRule(`
-            @keyframes progress-fill {
-                from { width: 0; }
-                to { width: 100%; }
-            }
-        `);
-        document.styleSheets[0].insertRule(`
-            .animate-progress {
-                animation: progress-fill 5s linear forwards;
-            }
-        `);
-
         function startStoryTimeout() {
             clearTimeout(storyTimeout);
             storyTimeout = setTimeout(() => {
@@ -645,7 +627,38 @@
                 }
             });
         }
-
+        
+        // Эта функция добавляет правила анимации. Она вызывается после загрузки DOM.
+        function addAnimationRules() {
+            if (document.styleSheets.length > 0) {
+                const styleSheet = document.styleSheets[0];
+                try {
+                    // Проверяем, существует ли правило, прежде чем добавлять
+                    const ruleExists = Array.from(styleSheet.cssRules).some(rule => rule.name === 'progress-fill');
+                    if (!ruleExists) {
+                        styleSheet.insertRule(`
+                            @keyframes progress-fill {
+                                from { width: 0; }
+                                to { width: 100%; }
+                            }
+                        `, styleSheet.cssRules.length);
+                    }
+                    const animateRuleExists = Array.from(styleSheet.cssRules).some(rule => rule.selectorText === '.animate-progress');
+                    if (!animateRuleExists) {
+                        styleSheet.insertRule(`
+                            .animate-progress {
+                                animation: progress-fill 5s linear forwards;
+                            }
+                        `, styleSheet.cssRules.length);
+                    }
+                } catch (e) {
+                    console.error("Failed to insert animation rules:", e);
+                }
+            } else {
+                console.error("No stylesheets found to insert rules into.");
+            }
+        }
+        
         // Инициализация
         document.addEventListener('DOMContentLoaded', () => {
             renderMenuItems(menuItems.burgers, menuLists.burgers, 'burgers');
@@ -656,6 +669,7 @@
             renderStories();
             filterAndSearchMenu();
             showCategory('burgers');
+            addAnimationRules(); // Вызываем эту функцию здесь
         });
     </script>
 </body>
