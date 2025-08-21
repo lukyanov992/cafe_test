@@ -33,40 +33,40 @@
         .progress-bar {
             animation: progress-fill 10s linear forwards;
         }
-        /* Дополнительные стили для мобильных устройств */
-        #app {
-            width: 100%;
+
+        /* Анимация для модальных окон */
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal-leave {
+            animation: fadeOut 0.3s ease-in forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        /* Анимация для подтверждения */
+        .checkmark-anim {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+        @keyframes stroke {
+            100% { stroke-dashoffset: 0; }
         }
 
-        @media (max-width: 1023px) {
-            body {
-                align-items: flex-start;
-            }
-            #app {
-                flex-direction: column;
-                max-width: none;
-                padding: 10px;
-                margin: 0;
-            }
-            main {
-                width: 100%;
-            }
-            aside {
-                width: 100%;
-                margin-top: 20px;
-            }
-            .menu-container {
-                height: auto;
-                max-height: 50vh; /* Ограничиваем высоту для скроллинга на мобильных */
-            }
-        }
     </style>
 </head>
-<body class="p-2 sm:p-4 md:p-8">
+<body class="p-2 sm:p-4 md:p-8 pb-32 lg:pb-16">
 
-    <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
+    <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6 md:gap-8 min-h-[calc(100vh-8rem)] lg:min-h-[calc(100vh-4rem)]">
         <!-- Основная область контента -->
-        <main class="w-full lg:w-3/5">
+        <div id="main-content-wrapper" class="w-full">
             <!-- Верхний заголовок с кнопками самовывоза и поиска -->
             <header class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
                 <button id="pickup-button" class="flex items-center gap-1 font-medium bg-[#241E1B] py-2 px-3 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0 text-xs sm:text-sm md:text-base">
@@ -88,103 +88,137 @@
                 </button>
             </header>
 
-            <!-- Секция историй -->
-            <section class="mb-6">
-                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Истории</h2>
-                <div id="story-container" class="flex gap-2 sm:gap-4 overflow-x-auto hide-scrollbar pb-2">
-                    <!-- Истории будут отображены здесь с помощью JS -->
-                </div>
-            </section>
-
-            <!-- Секция категорий -->
-            <section class="mb-6" id="category-section">
-                <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-                    <button data-category="burgers" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-white transition-colors duration-300 bg-[#AB3031]">Бургеры</button>
-                    <button data-category="pizza" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-gray-700 transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Пицца</button>
-                    <button data-category="snacks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-gray-700 transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Закуски</button>
-                    <button data-category="drinks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-gray-700 transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Напитки</button>
-                </div>
-            </section>
-
-            <!-- Секции меню -->
-            <section class="menu-container space-y-4 sm:space-y-6 hide-scrollbar h-[70vh] lg:h-[55vh] overflow-y-auto pr-2">
-                <div id="burgers-section">
-                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Бургеры</h2>
-                    <div id="burgers-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Бургеры будут отображены здесь с помощью JS -->
+            <!-- Контейнер для меню -->
+            <div id="menu-view" class="">
+                <!-- Секция историй -->
+                <section class="mb-6">
+                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Истории</h2>
+                    <div id="story-container" class="flex gap-2 sm:gap-4 overflow-x-auto hide-scrollbar pb-2">
+                        <!-- Истории будут отображены здесь с помощью JS -->
                     </div>
-                </div>
+                </section>
 
-                <div id="pizza-section" class="hidden">
-                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Пицца</h2>
-                    <div id="pizza-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Пицца будет отображена здесь с помощью JS -->
+                <!-- Секция категорий -->
+                <section class="mb-6" id="category-section">
+                    <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                        <button data-category="burgers" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-[#AB3031] text-white">Бургеры</button>
+                        <button data-category="pizza" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Пицца</button>
+                        <button data-category="snacks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Закуски</button>
+                        <button data-category="drinks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Напитки</button>
                     </div>
-                </div>
+                </section>
 
-                <div id="snacks-section" class="hidden">
-                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Закуски</h2>
-                    <div id="snacks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Закуски будут отображены здесь с помощью JS -->
+                <!-- Секции меню -->
+                <section class="menu-container space-y-4 sm:space-y-6 hide-scrollbar h-[70vh] lg:h-[55vh] overflow-y-auto pr-2">
+                    <div id="burgers-section" class="category-section">
+                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Бургеры</h2>
+                        <div id="burgers-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Бургеры будут отображены здесь с помощью JS -->
+                        </div>
                     </div>
-                </div>
 
-                <div id="drinks-section" class="hidden">
-                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Напитки</h2>
-                    <div id="drinks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Напитки будут отображены здесь с помощью JS -->
+                    <div id="pizza-section" class="category-section hidden">
+                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Пицца</h2>
+                        <div id="pizza-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Пицца будет отображена здесь с помощью JS -->
+                        </div>
                     </div>
-                </div>
-                <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
-            </section>
-        </main>
 
-        <!-- Секция корзины -->
-        <aside class="w-full lg:w-2/5 p-4 bg-[#241E1B] rounded-2xl shadow-inner flex flex-col">
-            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Ваш заказ</h2>
-            <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
-                <p id="empty-cart-message" class="text-gray-400 italic text-sm md:text-base text-center py-8">Ваша корзина пуста.</p>
-                <!-- Элементы корзины будут отображены здесь с помощью JS -->
+                    <div id="snacks-section" class="category-section hidden">
+                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Закуски</h2>
+                        <div id="snacks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Закуски будут отображены здесь с помощью JS -->
+                        </div>
+                    </div>
+
+                    <div id="drinks-section" class="category-section hidden">
+                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Напитки</h2>
+                        <div id="drinks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Напитки будут отображены здесь с помощью JS -->
+                        </div>
+                    </div>
+                    <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
+                </section>
             </div>
-            
-            <!-- Сводка заказа и кнопка оформления -->
-            <div class="mt-4 pt-4 border-t border-gray-600">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-sm md:text-lg font-semibold text-gray-300">Итого:</span>
-                    <span id="cart-total" class="text-lg md:text-2xl font-bold text-[#AB3031]">0 ₽</span>
-                </div>
-                <button id="checkout-button" class="w-full bg-[#AB3031] text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-[#972C2C] transition-transform transform active:scale-95 disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed text-sm md:text-lg">
-                    Оформить заказ
-                </button>
+
+            <!-- Контейнер для корзины (по умолчанию скрыт) -->
+            <div id="cart-view" class="hidden h-full">
+                <aside class="w-full p-4 bg-[#241E1B] rounded-2xl shadow-inner flex flex-col h-full">
+                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Ваш заказ</h2>
+                    <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
+                        <!-- Элементы корзины будут отображены здесь с помощью JS -->
+                    </div>
+                    <!-- Новая кнопка "Оформить заказ" в корзине -->
+                    <div id="place-order-wrapper" class="mt-4">
+                         <button id="place-order-btn" class="w-full bg-[#AB3031] text-white py-3 px-6 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C] disabled:bg-gray-700 disabled:cursor-not-allowed">
+                            Оформить заказ
+                        </button>
+                    </div>
+                </aside>
             </div>
-        </aside>
+
+            <!-- Контейнер для профиля (по умолчанию скрыт) -->
+            <div id="profile-view" class="hidden text-center h-[70vh] flex flex-col items-center justify-center p-4">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Профиль</h2>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 mb-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 3c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5zm0 15c-3.132 0-5.914-.903-7.98-2.618a8.046 8.046 0 0 1 7.98-5.382 8.046 8.046 0 0 1 7.98 5.382C17.914 19.097 15.132 20 12 20z"/></svg>
+                <p class="text-gray-400">Эта функция находится в разработке.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Фиксированная кнопка "Итого" -->
+    <div id="bottom-cart-summary" class="fixed bottom-[calc(5rem+1.5rem)] lg:bottom-[1.5rem] left-1/2 -translate-x-1/2 w-11/12 max-w-lg hidden z-40">
+        <div class="bg-white text-gray-900 rounded-full py-3 px-6 shadow-xl flex items-center justify-between transition-opacity duration-300">
+            <div class="flex flex-col items-start">
+                <span class="text-xs sm:text-sm font-semibold text-gray-500">Итого:</span>
+                <span id="summary-total" class="text-base sm:text-xl font-bold">0 ₽</span>
+            </div>
+            <button id="summary-checkout-btn" class="bg-[#AB3031] text-white py-2 px-4 sm:px-6 rounded-full font-bold text-xs sm:text-sm transition-colors hover:bg-[#972C2C]">
+                К оформлению
+            </button>
+        </div>
     </div>
 
+    <!-- Фиксированное нижнее меню -->
+    <nav class="fixed bottom-4 left-4 right-4 bg-[#AB3031] shadow-2xl z-50 rounded-xl">
+        <div class="flex justify-around items-center h-20 px-4">
+            <button id="nav-menu" class="nav-btn text-white flex flex-col items-center justify-center p-2 rounded-xl transition-transform transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M4 11h16v2H4zm0-5h16v2H4zm0 12h16v2H4z"/></svg>
+                <span class="text-xs font-medium">Меню</span>
+            </button>
+            <button id="nav-cart" class="nav-btn text-gray-200 flex flex-col items-center justify-center p-2 rounded-xl transition-transform transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0-12L6.1 3H4v2h2.1l3.5 7-1.3 2H17v-2H8.8l.9-2zm8.1 0-1.6-4H20v2h-2.1z"/></svg>
+                <span class="text-xs font-medium">Корзина</span>
+            </button>
+            <button id="nav-profile" class="nav-btn text-gray-200 flex flex-col items-center justify-center p-2 rounded-xl transition-transform transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mb-1" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 3c2.757 0 5 2.243 5 5s-2.243 5-5 5-5-2.243-5-5 2.243-5 5-5zm0 15c-3.132 0-5.914-.903-7.98-2.618a8.046 8.046 0 0 1 7.98-5.382 8.046 8.046 0 0 1 7.98 5.382C17.914 19.097 15.132 20 12 20z"/></svg>
+                <span class="text-xs font-medium">Профиль</span>
+            </button>
+        </div>
+    </nav>
+
     <!-- Модальное окно самовывоза -->
-    <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+    <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg sm:text-xl md:text-2xl font-bold">Выберите точку самовывоза</h3>
                 <button id="close-modal-btn" class="text-gray-400 hover:text-white transition-colors text-3xl leading-none">&times;</button>
             </div>
             <div id="pickup-locations" class="space-y-4">
-                <button class="pickup-location-btn w-full text-left p-3 sm:p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition">
+                <button data-location-name="Москва, Тверская улица, 15" class="pickup-location-btn w-full text-left p-3 sm:p-4 rounded-xl transition bg-gray-700">
                     <h4 class="font-semibold text-sm md:text-base">Москва, Тверская улица, 15</h4>
                     <p class="text-gray-400 text-xs md:text-sm">Время работы: 10:00 - 22:00</p>
                 </button>
-                <button class="pickup-location-btn w-full text-left p-3 sm:p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition">
+                <button data-location-name="Москва, Арбат, 50" class="pickup-location-btn w-full text-left p-3 sm:p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition">
                     <h4 class="font-semibold text-sm md:text-base">Москва, Арбат, 50</h4>
                     <p class="text-gray-400 text-xs md:text-sm">Время работы: 09:00 - 23:00</p>
                 </button>
-            </div>
-            <div class="text-center mt-6">
-                <button class="bg-gray-700 text-white py-2 px-4 rounded-xl hover:bg-gray-600 transition text-sm md:text-base" id="cancel-pickup-btn">Отмена</button>
             </div>
         </div>
     </div>
 
     <!-- Модальное окно фильтров -->
-    <div id="filter-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+    <div id="filter-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg sm:text-xl md:text-2xl font-bold">Фильтры</h3>
@@ -208,417 +242,738 @@
     </div>
 
     <!-- Модальное окно просмотра историй -->
-    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50">
+    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50 modal-enter">
         <!-- Кнопка закрытия -->
         <button id="close-story-modal-btn" class="absolute top-4 right-4 text-white text-3xl leading-none z-20">&times;</button>
         <!-- Прогресс-бар -->
         <div id="story-progress-container" class="absolute top-4 left-0 right-0 p-4 pt-10 flex gap-2 justify-center z-10">
             <!-- Сегменты прогресс-бара будут добавлены динамически -->
         </div>
-
         <!-- Контент истории -->
-        <div class="relative w-full h-full max-w-sm mx-auto">
+        <div class="relative w-full max-w-xs md:max-w-sm lg:max-w-md aspect-[9/16]">
             <img id="story-image" src="" alt="Story" class="w-full h-full object-contain rounded-xl shadow-lg">
+            <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-4">
+                <p id="story-text" class="text-white text-sm md:text-base font-semibold text-center"></p>
+            </div>
         </div>
+        <!-- Кнопки навигации -->
+        <button id="prev-story-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10 hidden">&lt;</button>
+        <button id="next-story-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10 hidden">&gt;</button>
     </div>
 
-
-    <!-- Диалоговое окно для подтверждения заказа вместо alert() -->
-    <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
-        <div class="bg-gray-900 text-white rounded-lg p-6 sm:p-8 m-4 max-w-sm w-full text-center shadow-2xl">
-            <h3 class="text-xl md:text-2xl font-bold mb-4 text-green-400">Заказ оформлен!</h3>
-            <p id="message-text" class="text-gray-300 mb-6 text-sm md:text-base"></p>
-            <button id="close-message-button" class="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition text-sm md:text-base">Отлично</button>
+    <!-- Модальное окно для оформления заказа (новая функциональность) -->
+    <div id="order-form-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
+        <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold">Оформление заказа</h3>
+                <button id="close-order-form-btn" class="text-gray-400 hover:text-white transition-colors text-3xl leading-none">&times;</button>
+            </div>
+            <form id="order-form" class="space-y-4">
+                <div>
+                    <label for="name" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Имя</label>
+                    <input type="text" id="name" placeholder="Ваше имя" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                </div>
+                <div>
+                    <label for="phone" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Номер телефона</label>
+                    <input type="tel" id="phone" placeholder="+7 (XXX) XXX-XX-XX" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                </div>
+                <div>
+                    <label for="pickup-time" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Когда заберете</label>
+                    <select id="pickup-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                        <option value="now">Сейчас</option>
+                        <option value="30min">Через 30 мин</option>
+                        <option value="1hour">Через час</option>
+                        <option value="custom">Ко времени</option>
+                    </select>
+                </div>
+                <div id="custom-time-container" class="hidden">
+                     <label for="custom-time" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Укажите время</label>
+                     <input type="time" id="custom-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                </div>
+                <button type="submit" id="pay-button" class="w-full bg-[#AB3031] text-white py-3 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C]">
+                    Оплатить
+                </button>
+            </form>
         </div>
     </div>
+    
+    <!-- Модальное окно для подтверждения заказа (вместо alert()) -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
+        <div class="bg-[#111111] text-white rounded-2xl p-6 sm:p-8 m-4 max-w-sm w-full text-center shadow-2xl flex flex-col items-center">
+            <div class="w-20 h-20 mb-4 bg-green-500 rounded-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-white" viewBox="0 0 52 52">
+                    <path class="checkmark-anim" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" stroke="#fff" stroke-width="4" stroke-miterlimit="10" />
+                </svg>
+            </div>
+            <h3 class="text-xl md:text-2xl font-bold mb-2">Заказ оформлен!</h3>
+            <p id="confirmation-text" class="text-gray-400 mb-6 text-sm md:text-base">Ваш заказ успешно оформлен. Уведомление о готовности придет в Telegram.</p>
+            <button id="close-confirmation-btn" class="w-full bg-[#AB3031] text-white py-3 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C]">Отлично</button>
+        </div>
+    </div>
+    
 
     <script>
         // Данные для элементов меню
         const menuItems = {
             burgers: [
-                { id: 'burger_1', name: 'Классический бургер', price: 350, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер' },
-                { id: 'burger_2', name: 'Острый бургер', price: 400, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер' },
-                { id: 'burger_3', name: 'Вегетарианский бургер', price: 380, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер' }
+                { id: 'burger_1', name: 'Классический бургер', price: 350, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер', category: 'burgers' },
+                { id: 'burger_2', name: 'Острый бургер', price: 400, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер', category: 'burgers' },
+                { id: 'burger_3', name: 'Вегетарианский бургер', price: 380, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер', category: 'burgers' }
             ],
             pizza: [
-                { id: 'pizza_1', name: 'Пицца Пепперони', price: 650, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца' },
-                { id: 'pizza_2', name: 'Пицца Маргарита', price: 550, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца' },
-                { id: 'pizza_3', name: 'Пицца Четыре сыра', price: 700, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца' }
+                { id: 'pizza_1', name: 'Пепперони', price: 500, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца', category: 'pizza' },
+                { id: 'pizza_2', name: 'Маргарита', price: 450, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца', category: 'pizza' },
+                { id: 'pizza_3', name: 'Четыре сыра', price: 550, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца', category: 'pizza' }
             ],
             snacks: [
-                { id: 'snack_1', name: 'Картофель фри', price: 120, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Фри' },
-                { id: 'snack_2', name: 'Луковые кольца', price: 150, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Кольца' }
+                { id: 'snack_1', name: 'Картофель фри', price: 120, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Картошка', category: 'snacks' },
+                { id: 'snack_2', name: 'Наггетсы', price: 180, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Наггетсы', category: 'snacks' },
+                { id: 'snack_3', name: 'Луковые кольца', price: 150, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Лук', category: 'snacks' }
             ],
             drinks: [
-                { id: 'drink_1', name: 'Кола', price: 100, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Кола' },
-                { id: 'drink_2', name: 'Латте', price: 180, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Латте' }
+                { id: 'drink_1', name: 'Кока-Кола', price: 100, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Кола', category: 'drinks' },
+                { id: 'drink_2', name: 'Апельсиновый сок', price: 110, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Сок', category: 'drinks' },
+                { id: 'drink_3', name: 'Молочный коктейль', price: 150, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Коктейль', category: 'drinks' }
             ]
         };
-        // Данные для историй
-        const stories = [
-            { id: 'story_1', image: 'https://placehold.co/400x600/3A243F/ffffff?text=Новое\nменю' },
-            { id: 'story_2', image: 'https://placehold.co/400x600/1D424F/ffffff?text=Скидка\n-20%' },
-            { id: 'story_3', image: 'https://placehold.co/400x600/38473D/ffffff?text=Акция\nНедели' },
-            { id: 'story_4', image: 'https://placehold.co/400x600/3B3B3B/ffffff?text=Наш\nКофе' },
-            { id: 'story_5', image: 'https://placehold.co/400x600/1C273D/ffffff?text=Бесплатная\nДоставка' },
+
+        const allMenuItems = Object.values(menuItems).flat();
+
+        // Данные для историй, теперь с размерами 9:16
+        const storyData = [
+            {
+                image: 'https://placehold.co/900x1600/AB3031/ffffff?text=Новый+комбо-набор',
+                text: 'Новый комбо-набор уже в продаже!'
+            },
+            {
+                image: 'https://placehold.co/900x1600/1a202c/ffffff?text=Счастливые+часы',
+                text: 'Счастливые часы с 16:00 до 18:00!'
+            },
+            {
+                image: 'https://placehold.co/900x1600/d1d5db/1f2937?text=Спецпредложение+недели',
+                text: 'Спецпредложение недели: двойной чизбургер!'
+            }
         ];
+        
+        // Карта для хранения корзины
+        let cart = new Map();
 
-        let cart = {}; // Объект для хранения элементов корзины: {itemId: quantity}
-        let currentPickupLocation = null;
-        let activeFilters = { minPrice: null, maxPrice: null };
-        let storyTimeout = null;
-        let currentStoryIndex = 0;
-        let touchStartX = 0; // Переменная для отслеживания начала касания
-
-        // Элементы DOM
-        const menuLists = {
-            burgers: document.getElementById('burgers-list'),
-            pizza: document.getElementById('pizza-list'),
-            snacks: document.getElementById('snacks-list'),
-            drinks: document.getElementById('drinks-list')
-        };
-        const menuSections = document.querySelectorAll('.menu-container > div');
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        const categorySection = document.getElementById('category-section');
-        const cartContainer = document.getElementById('cart-items-container');
-        const cartTotalSpan = document.getElementById('cart-total');
-        const checkoutButton = document.getElementById('checkout-button');
-        const emptyCartMessage = document.getElementById('empty-cart-message');
-        const searchInput = document.getElementById('search-input');
-        const noResultsMessage = document.getElementById('no-results');
-
-        // Модальное окно самовывоза
+        // DOM элементы
         const pickupButton = document.getElementById('pickup-button');
-        const pickupModal = document.getElementById('pickup-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const cancelPickupBtn = document.getElementById('cancel-pickup-btn');
-
-        // Модальное окно фильтров
         const filterButton = document.getElementById('filter-button');
-        const filterModal = document.getElementById('filter-modal');
-        const closeFilterModalBtn = document.getElementById('close-filter-modal-btn');
-        const clearFiltersBtn = document.getElementById('clear-filters-btn');
-        const applyFiltersBtn = document.getElementById('apply-filters-btn');
-        const minPriceInput = document.getElementById('min-price');
-        const maxPriceInput = document.getElementById('max-price');
-
-        // Модальное окно историй
+        const searchInput = document.getElementById('search-input');
+        const categoryTabs = document.getElementById('category-tabs');
         const storyContainer = document.getElementById('story-container');
+        const mainContentWrapper = document.getElementById('main-content-wrapper');
+        const menuView = document.getElementById('menu-view');
+        const cartView = document.getElementById('cart-view');
+        const profileView = document.getElementById('profile-view');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        const placeOrderWrapper = document.getElementById('place-order-wrapper');
+        
+        const pickupModal = document.getElementById('pickup-modal');
+        const filterModal = document.getElementById('filter-modal');
         const storyModal = document.getElementById('story-modal');
+        const orderFormModal = document.getElementById('order-form-modal');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const closePickupModalBtn = document.getElementById('close-modal-btn');
+        const closeFilterModalBtn = document.getElementById('close-filter-modal-btn');
         const closeStoryModalBtn = document.getElementById('close-story-modal-btn');
+        const closeOrderFormBtn = document.getElementById('close-order-form-btn');
+        const closeConfirmationBtn = document.getElementById('close-confirmation-btn');
+        
         const storyImage = document.getElementById('story-image');
+        const storyText = document.getElementById('story-text');
         const storyProgressContainer = document.getElementById('story-progress-container');
-
-        // Модальное окно с сообщением
+        const prevStoryBtn = document.getElementById('prev-story-btn');
+        const nextStoryBtn = document.getElementById('next-story-btn');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
-        const closeMessageBoxButton = document.getElementById('close-message-button');
-
-        // Функции
+        const closeMessageButton = document.getElementById('close-message-button');
+        const pickupLocations = document.getElementById('pickup-locations');
+        const applyFiltersBtn = document.getElementById('apply-filters-btn');
+        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        const minPriceInput = document.getElementById('min-price');
+        const maxPriceInput = document.getElementById('max-price');
+        const bottomCartSummary = document.getElementById('bottom-cart-summary');
+        const summaryTotal = document.getElementById('summary-total');
+        const summaryCheckoutBtn = document.getElementById('summary-checkout-btn');
         
-        // Показывает диалоговое окно вместо alert()
-        function showMessageBox(message) {
-            messageText.textContent = message;
-            messageBox.classList.remove('hidden');
-        }
+        // Новые элементы формы заказа
+        const orderForm = document.getElementById('order-form');
+        const nameInput = document.getElementById('name');
+        const phoneInput = document.getElementById('phone');
+        const pickupTimeSelect = document.getElementById('pickup-time');
+        const customTimeContainer = document.getElementById('custom-time-container');
+        const customTimeInput = document.getElementById('custom-time');
+        const payButton = document.getElementById('pay-button');
+        const confirmationText = document.getElementById('confirmation-text');
+        
+        // Кнопки нижнего меню
+        const navMenuBtn = document.getElementById('nav-menu');
+        const navCartBtn = document.getElementById('nav-cart');
+        const navProfileBtn = document.getElementById('nav-profile');
 
-        // Рендеринг элементов меню
-        function renderMenuItems(items, container, category) {
-            container.innerHTML = '';
-            items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = `bg-gray-800 rounded-xl p-3 flex flex-col items-center text-center transition-transform transform hover:scale-105 relative cursor-pointer group`;
-                itemElement.innerHTML = `
-                    <div class="relative w-full aspect-square mb-2 overflow-hidden rounded-xl">
-                        <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover rounded-xl">
-                    </div>
-                    <div class="flex-grow flex flex-col justify-end">
-                        <h3 class="text-sm font-semibold text-white truncate w-full mb-1">${item.name}</h3>
-                        <p class="text-sm font-bold text-[#AB3031]">${item.price} ₽</p>
-                    </div>
-                    <button class="add-to-cart-btn absolute bottom-3 right-3 bg-[#AB3031] text-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity transform active:scale-95" data-id="${item.id}" data-category="${category}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </button>
-                `;
-                container.appendChild(itemElement);
+        let currentStoryIndex = 0;
+        let storyProgressInterval;
+        let touchStartX = 0;
+        
+        const pickupAddresses = document.querySelectorAll('.pickup-location-btn');
+        const defaultPickupAddress = pickupAddresses[0];
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStories();
+            renderAllMenuItems();
+            attachEventListeners();
+            // Показываем корректный вид при загрузке
+            showView('menu');
+            // Применяем начальные стили для кнопок категорий
+            updateCategoryButtons('burgers');
+            // Устанавливаем адрес по умолчанию
+            setInitialPickupLocation();
+        });
+
+        // Слушатели событий
+        function attachEventListeners() {
+            pickupButton.addEventListener('click', () => {
+                pickupModal.classList.remove('hidden');
+                pickupModal.classList.add('modal-enter');
             });
+            closePickupModalBtn.addEventListener('click', () => {
+                pickupModal.classList.add('modal-leave');
+                setTimeout(() => {
+                    pickupModal.classList.add('hidden');
+                    pickupModal.classList.remove('modal-leave');
+                }, 300);
+            });
+
+            // Обработка выбора точки самовывоза
+            pickupLocations.addEventListener('click', (e) => {
+                const targetButton = e.target.closest('.pickup-location-btn');
+                if (targetButton) {
+                    // Снимаем выделение со всех
+                    pickupAddresses.forEach(btn => btn.classList.remove('bg-gray-700'));
+                    pickupAddresses.forEach(btn => btn.classList.add('bg-gray-800', 'hover:bg-gray-700'));
+                    
+                    // Выделяем выбранную
+                    targetButton.classList.remove('bg-gray-800', 'hover:bg-gray-700');
+                    targetButton.classList.add('bg-gray-700');
+                    
+                    const selectedLocation = targetButton.dataset.locationName;
+                    pickupButton.querySelector('span').textContent = selectedLocation;
+                    pickupModal.classList.add('modal-leave');
+                    setTimeout(() => {
+                        pickupModal.classList.add('hidden');
+                        pickupModal.classList.remove('modal-leave');
+                    }, 300);
+                }
+            });
+
+            filterButton.addEventListener('click', () => {
+                filterModal.classList.remove('hidden');
+                filterModal.classList.add('modal-enter');
+            });
+            closeFilterModalBtn.addEventListener('click', () => {
+                filterModal.classList.add('modal-leave');
+                setTimeout(() => {
+                    filterModal.classList.add('hidden');
+                    filterModal.classList.remove('modal-leave');
+                }, 300);
+            });
+
+            // Слушатели для фильтров
+            applyFiltersBtn.addEventListener('click', applyFilters);
+            clearFiltersBtn.addEventListener('click', clearFilters);
+
+            // Слушатель для поиска
+            searchInput.addEventListener('input', () => {
+                filterAndSearchMenu();
+            });
+
+            // Теперь кнопка "К оформлению" просто переключает на вид корзины
+            summaryCheckoutBtn.addEventListener('click', () => showView('cart'));
+
+            // Слушатель для новой кнопки "Оформить заказ"
+            placeOrderBtn.addEventListener('click', showOrderForm);
+            
+            // Слушатели для модальных окон
+            closeStoryModalBtn.addEventListener('click', () => hideModal(storyModal));
+            closeOrderFormBtn.addEventListener('click', () => hideModal(orderFormModal));
+            closeConfirmationBtn.addEventListener('click', () => hideModal(confirmationModal));
+
+            // Навигация по историям
+            prevStoryBtn.addEventListener('click', showPrevStory);
+            nextStoryBtn.addEventListener('click', showNextStory);
+
+            // Обработка свайпов на модальном окне истории
+            storyModal.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].clientX;
+            });
+            storyModal.addEventListener('touchend', (e) => {
+                const touchEndX = e.changedTouches[0].clientX;
+                const deltaX = touchEndX - touchStartX;
+                const swipeThreshold = 50;
+                if (deltaX > swipeThreshold) {
+                    showPrevStory();
+                } else if (deltaX < -swipeThreshold) {
+                    showNextStory();
+                }
+            });
+
+            // Слушатели для нижнего меню
+            navMenuBtn.addEventListener('click', () => showView('menu'));
+            navCartBtn.addEventListener('click', () => showView('cart'));
+            navProfileBtn.addEventListener('click', () => showView('profile'));
+
+            // Слушатель для кнопок категорий
+            categoryTabs.addEventListener('click', (e) => {
+                const button = e.target.closest('.category-btn');
+                if (button) {
+                    const category = button.dataset.category;
+                    showCategory(category);
+                }
+            });
+
+            // Слушатель для изменения времени самовывоза
+            pickupTimeSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'custom') {
+                    customTimeContainer.classList.remove('hidden');
+                } else {
+                    customTimeContainer.classList.add('hidden');
+                }
+            });
+            
+            // Слушатель для отправки формы заказа
+            orderForm.addEventListener('submit', handleOrderSubmit);
         }
-
-        // Рендеринг корзины
-        function renderCart() {
-            cartContainer.innerHTML = '';
-            let total = 0;
-            const hasItems = Object.keys(cart).length > 0;
-
-            if (!hasItems) {
-                emptyCartMessage.classList.remove('hidden');
-                checkoutButton.disabled = true;
-                cartTotalSpan.textContent = '0 ₽';
-                return;
-            } else {
-                emptyCartMessage.classList.add('hidden');
-                checkoutButton.disabled = false;
+        
+        /**
+         * Устанавливает начальное место самовывоза.
+         */
+        function setInitialPickupLocation() {
+            if (defaultPickupAddress) {
+                const selectedLocation = defaultPickupAddress.dataset.locationName;
+                pickupButton.querySelector('span').textContent = selectedLocation;
+            }
+        }
+        
+        /**
+         * Переключает отображаемый вид (меню, корзина, профиль).
+         * @param {string} viewName Имя вида ('menu', 'cart', 'profile').
+         */
+        function showView(viewName) {
+            const views = {
+                'menu': menuView,
+                'cart': cartView,
+                'profile': profileView
+            };
+            
+            Object.values(views).forEach(view => view.classList.add('hidden'));
+            
+            if (views[viewName]) {
+                views[viewName].classList.remove('hidden');
             }
             
-            for (const itemId in cart) {
-                const quantity = cart[itemId];
-                const item = findItemById(itemId);
-
-                if (item) {
-                    const itemElement = document.createElement('div');
-                    itemElement.className = `cart-item flex items-center justify-between bg-gray-700 p-3 rounded-xl mb-2`;
-                    const itemTotal = item.price * quantity;
-                    total += itemTotal;
-                    itemElement.innerHTML = `
-                        <div class="flex items-center gap-2">
-                            <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded-md">
-                            <div>
-                                <h4 class="text-white text-sm font-medium">${item.name}</h4>
-                                <p class="text-gray-300 text-xs">${item.price} ₽</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="flex items-center bg-gray-600 rounded-full p-1">
-                                <button class="decrement-quantity-btn text-white p-1 rounded-full hover:bg-gray-500 transition-colors" data-id="${item.id}">-</button>
-                                <span class="text-white font-semibold text-sm px-2">${quantity}</span>
-                                <button class="increment-quantity-btn text-white p-1 rounded-full hover:bg-gray-500 transition-colors" data-id="${item.id}">+</button>
-                            </div>
-                            <span class="text-[#AB3031] font-bold text-sm min-w-[50px] text-right">${itemTotal} ₽</span>
-                        </div>
-                    `;
-                    cartContainer.appendChild(itemElement);
-                }
-            }
-            cartTotalSpan.textContent = `${total} ₽`;
-        }
-
-        // Поиск элемента по ID
-        function findItemById(id) {
-            for (const category in menuItems) {
-                const found = menuItems[category].find(item => item.id === id);
-                if (found) {
-                    return found;
-                }
-            }
-            return null;
-        }
-
-        // Обработка кликов
-        document.body.addEventListener('click', e => {
-            // Добавление в корзину
-            if (e.target.closest('.add-to-cart-btn')) {
-                const btn = e.target.closest('.add-to-cart-btn');
-                const itemId = btn.dataset.id;
-                if (cart[itemId]) {
-                    cart[itemId]++;
-                } else {
-                    cart[itemId] = 1;
-                }
-                renderCart();
-            }
-
-            // Увеличение количества
-            if (e.target.closest('.increment-quantity-btn')) {
-                const btn = e.target.closest('.increment-quantity-btn');
-                const itemId = btn.dataset.id;
-                if (cart[itemId]) {
-                    cart[itemId]++;
-                }
-                renderCart();
-            }
-
-            // Уменьшение количества
-            if (e.target.closest('.decrement-quantity-btn')) {
-                const btn = e.target.closest('.decrement-quantity-btn');
-                const itemId = btn.dataset.id;
-                if (cart[itemId] && cart[itemId] > 1) {
-                    cart[itemId]--;
-                } else {
-                    delete cart[itemId];
-                }
-                renderCart();
-            }
-        });
-
-        // Обработка заказа
-        checkoutButton.addEventListener('click', () => {
-            if (Object.keys(cart).length === 0) {
-                showMessageBox("Ваша корзина пуста. Добавьте товары, чтобы оформить заказ.");
-            } else {
-                showMessageBox("Ваш заказ успешно оформлен! Ожидайте подтверждения.");
-            }
-        });
-
-        // Закрытие модального окна с сообщением
-        closeMessageBoxButton.addEventListener('click', () => {
-            messageBox.classList.add('hidden');
-        });
-
-        // Обработка кнопок категорий
-        categoryButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const category = btn.dataset.category;
-                showCategory(category);
+            // Обновляем состояние кнопок навигации
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-white');
+                btn.classList.add('text-gray-200');
             });
-        });
-
-        // Поиск и фильтрация
-        function filterAndSearchMenu() {
-            const searchQuery = searchInput.value.toLowerCase();
-            const minPrice = activeFilters.minPrice;
-            const maxPrice = activeFilters.maxPrice;
-
-            let foundCount = 0;
-            // Проходим по всем категориям
-            for (const category in menuItems) {
-                const container = menuLists[category];
-                if (!container) continue;
-
-                const filteredItems = menuItems[category].filter(item => {
-                    const nameMatches = item.name.toLowerCase().includes(searchQuery);
-                    const priceMatches = (!minPrice || item.price >= minPrice) && (!maxPrice || item.price <= maxPrice);
-                    return nameMatches && priceMatches;
-                });
-                
-                // Скрываем или показываем секцию, если есть результаты
-                const section = document.getElementById(`${category}-section`);
-                if (filteredItems.length > 0) {
-                    section.classList.remove('hidden');
-                    renderMenuItems(filteredItems, container, category);
-                    foundCount++;
-                } else {
-                    section.classList.add('hidden');
-                }
+            const navBtn = document.getElementById(`nav-${viewName}`);
+            if (navBtn) {
+                navBtn.classList.remove('text-gray-200');
+                navBtn.classList.add('text-white');
             }
-
-            if (foundCount === 0) {
-                noResultsMessage.classList.remove('hidden');
-            } else {
-                noResultsMessage.classList.add('hidden');
+            
+            // Если переключились на корзину, то рендерим ее содержимое
+            if (viewName === 'cart') {
+                renderCart();
             }
         }
 
-        searchInput.addEventListener('input', filterAndSearchMenu);
-        applyFiltersBtn.addEventListener('click', () => {
-            activeFilters.minPrice = parseFloat(minPriceInput.value) || null;
-            activeFilters.maxPrice = parseFloat(maxPriceInput.value) || null;
-            filterAndSearchMenu();
-            filterModal.classList.add('hidden');
-        });
-
-        clearFiltersBtn.addEventListener('click', () => {
-            minPriceInput.value = '';
-            maxPriceInput.value = '';
-            activeFilters.minPrice = null;
-            activeFilters.maxPrice = null;
-            filterAndSearchMenu();
-        });
-
-        // Управление модальными окнами
-        pickupButton.addEventListener('click', () => pickupModal.classList.remove('hidden'));
-        closeModalBtn.addEventListener('click', () => pickupModal.classList.add('hidden'));
-        cancelPickupBtn.addEventListener('click', () => pickupModal.classList.add('hidden'));
-
-        filterButton.addEventListener('click', () => filterModal.classList.remove('hidden'));
-        closeFilterModalBtn.addEventListener('click', () => filterModal.classList.add('hidden'));
-
-        // Рендеринг историй
+        /**
+         * Рендерит истории на главной странице.
+         */
         function renderStories() {
-            storyContainer.innerHTML = '';
-            stories.forEach((story, index) => {
-                const storyElement = document.createElement('div');
-                storyElement.className = `flex-shrink-0 w-20 sm:w-24 md:w-28 cursor-pointer relative`;
-                storyElement.innerHTML = `
-                    <img src="${story.image}" alt="Story ${index + 1}" class="w-full h-auto rounded-full border-2 border-[#AB3031] aspect-square object-cover">
-                    <p class="text-center text-xs sm:text-sm mt-1 text-gray-400">Story ${index + 1}</p>
-                `;
-                storyElement.addEventListener('click', () => showStory(index));
-                storyContainer.appendChild(storyElement);
+            storyContainer.innerHTML = storyData.map((story, index) => `
+                <div data-index="${index}" class="story-item relative w-[90px] h-[160px] sm:w-[100px] sm:h-[178px] rounded-xl overflow-hidden flex-shrink-0 cursor-pointer">
+                    <img src="${story.image}" alt="Story ${index + 1}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+                    <p class="absolute bottom-2 left-2 text-white text-[10px] sm:text-xs font-semibold">${story.text}</p>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.story-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const index = parseInt(item.dataset.index);
+                    showStory(index);
+                });
             });
         }
 
+        /**
+         * Отображает модальное окно истории.
+         * @param {number} index Индекс истории для отображения.
+         */
         function showStory(index) {
             currentStoryIndex = index;
-            storyImage.src = stories[currentStoryIndex].image;
+            const story = storyData[currentStoryIndex];
+            storyImage.src = story.image;
+            storyText.textContent = story.text;
             storyModal.classList.remove('hidden');
-            
-            renderStoryProgress();
-            startStoryTimeout();
+            storyModal.classList.add('modal-enter');
+            updateStoryIndicators();
+            startStoryProgress();
+            updateStoryNavigation();
         }
 
-        function renderStoryProgress() {
-            storyProgressContainer.innerHTML = '';
-            stories.forEach((_, index) => {
-                const bar = document.createElement('div');
-                bar.className = 'progress-bar-segment flex-grow h-1 bg-gray-500 rounded-full relative overflow-hidden';
-                if (index < currentStoryIndex) {
-                    bar.innerHTML = `<div class="w-full h-full bg-white"></div>`;
-                } else if (index === currentStoryIndex) {
-                    bar.innerHTML = `<div class="w-0 h-full bg-white animate-progress"></div>`;
+        /**
+         * Скрывает модальное окно истории.
+         */
+        function hideStoryModal() {
+            storyModal.classList.add('modal-leave');
+            clearInterval(storyProgressInterval);
+            setTimeout(() => {
+                storyModal.classList.add('hidden');
+                storyModal.classList.remove('modal-leave');
+            }, 300);
+        }
+        
+        /**
+         * Скрывает любое модальное окно.
+         * @param {HTMLElement} modalElement Элемент модального окна для скрытия.
+         */
+        function hideModal(modalElement) {
+            modalElement.classList.add('modal-leave');
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+                modalElement.classList.remove('modal-leave');
+            }, 300);
+        }
+
+        /**
+         * Переходит к следующей истории.
+         */
+        function showNextStory() {
+            clearInterval(storyProgressInterval);
+            currentStoryIndex = (currentStoryIndex + 1) % storyData.length;
+            showStory(currentStoryIndex);
+        }
+
+        /**
+         * Переходит к предыдущей истории.
+         */
+        function showPrevStory() {
+            clearInterval(storyProgressInterval);
+            currentStoryIndex = (currentStoryIndex - 1 + storyData.length) % storyData.length;
+            showStory(currentStoryIndex);
+        }
+
+        /**
+         * Обновляет состояние кнопок навигации по историям.
+         */
+        function updateStoryNavigation() {
+            prevStoryBtn.classList.toggle('hidden', currentStoryIndex === 0);
+            nextStoryBtn.classList.toggle('hidden', currentStoryIndex === storyData.length - 1);
+        }
+
+        /**
+         * Запускает прогресс-бар для текущей истории.
+         */
+        function startStoryProgress() {
+            clearInterval(storyProgressInterval);
+            const progressBar = storyProgressContainer.children[currentStoryIndex]?.querySelector('.progress-fill');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 10);
+            }
+            storyProgressInterval = setTimeout(showNextStory, 5000); // 5 секунд на историю
+        }
+
+        /**
+         * Обновляет индикаторы прогресса историй.
+         */
+        function updateStoryIndicators() {
+            storyProgressContainer.innerHTML = storyData.map((_, index) => `
+                <div class="h-1 rounded-full bg-gray-600 flex-1">
+                    <div class="progress-fill h-full bg-white rounded-full transition-all ease-linear" style="width: ${index < currentStoryIndex ? '100%' : '0%'}; transition-duration: 5s;"></div>
+                </div>
+            `).join('');
+        }
+        
+        /**
+         * Создает HTML-разметку для блока управления товаром (кнопка добавления или счетчик).
+         * @param {object} item Объект элемента меню.
+         * @returns {string} HTML-разметка.
+         */
+        function createItemControlHtml(item) {
+            const cartItem = cart.get(item.id);
+            const isAdded = !!cartItem;
+            const quantity = isAdded ? cartItem.quantity : 0;
+            
+            if (isAdded) {
+                return `
+                    <div class="flex items-center justify-between gap-2 bg-white text-gray-900 rounded-full p-2 w-full text-xs sm:text-sm transition-colors duration-300">
+                        <button class="quantity-btn w-6 h-6 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 transition" data-id="${item.id}" data-action="decrease">-</button>
+                        <span class="font-bold">${quantity}</span>
+                        <button class="quantity-btn w-6 h-6 rounded-full flex items-center justify-center bg-gray-200 hover:bg-gray-300 transition" data-id="${item.id}" data-action="increase">+</button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <button class="add-to-cart-btn mt-2 bg-[#AB3031] text-white rounded-xl py-2 px-4 w-full text-xs sm:text-sm transition-colors duration-300 hover:bg-[#972C2C]"
+                            data-id="${item.id}">
+                        Добавить
+                    </button>
+                `;
+            }
+        }
+
+        /**
+         * Рендерит все элементы меню.
+         */
+        function renderAllMenuItems() {
+            Object.keys(menuItems).forEach(category => {
+                const listContainer = document.getElementById(`${category}-list`);
+                if (listContainer) {
+                    listContainer.innerHTML = ''; // Очищаем контейнер перед рендерингом
+                    menuItems[category].forEach(item => {
+                        listContainer.innerHTML += `
+                            <div id="item-${item.id}" class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
+                                <img src="${item.image}" alt="${item.name}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-2 object-cover">
+                                <h3 class="font-bold text-sm sm:text-base">${item.name}</h3>
+                                <p class="text-xs sm:text-sm text-gray-400 my-1">${item.price} ₽</p>
+                                <div id="item-control-${item.id}" class="w-full">
+                                    ${createItemControlHtml(item)}
+                                </div>
+                            </div>
+                        `;
+                    });
                 }
-                storyProgressContainer.appendChild(bar);
+            });
+            attachMenuItemEventListeners();
+        }
+        
+        /**
+         * Прикрепляет слушатели событий к кнопкам меню.
+         */
+        function attachMenuItemEventListeners() {
+            // Убираем старые слушатели, чтобы избежать дублирования
+            document.querySelectorAll('.add-to-cart-btn, .quantity-btn').forEach(btn => {
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+            });
+
+            // Добавляем новые слушатели
+            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+                button.addEventListener('click', addToCart);
+            });
+            document.querySelectorAll('.quantity-btn').forEach(button => {
+                button.addEventListener('click', updateQuantity);
+            });
+        }
+        
+        /**
+         * Обновляет HTML-разметку блока управления одного элемента меню.
+         * @param {object} item Объект элемента меню.
+         */
+        function updateMenuItemControl(item) {
+            const controlElement = document.getElementById(`item-control-${item.id}`);
+            if (controlElement) {
+                controlElement.innerHTML = createItemControlHtml(item);
+                attachMenuItemEventListeners(); // Переприкрепляем слушатели
+            }
+        }
+
+        /**
+         * Добавляет элемент в корзину и обновляет UI.
+         * @param {Event} event Объект события.
+         */
+        function addToCart(event) {
+            const itemId = event.target.dataset.id;
+            const item = allMenuItems.find(i => i.id === itemId);
+
+            if (item) {
+                cart.set(itemId, { ...item, quantity: 1 });
+                updateMenuItemControl(item);
+                updateBottomCartSummary();
+            }
+        }
+
+        /**
+         * Обновляет количество товара в корзине и обновляет UI.
+         * @param {Event} event Объект события.
+         */
+        function updateQuantity(event) {
+            const itemId = event.target.dataset.id;
+            const action = event.target.dataset.action;
+            const item = cart.get(itemId);
+            if (item) {
+                if (action === 'increase') {
+                    item.quantity++;
+                } else if (action === 'decrease') {
+                    item.quantity--;
+                    if (item.quantity <= 0) {
+                        cart.delete(itemId);
+                    }
+                }
+                const originalItem = allMenuItems.find(i => i.id === itemId);
+                if (originalItem) {
+                    updateMenuItemControl(originalItem);
+                }
+                updateBottomCartSummary();
+                // Если мы находимся на странице корзины, обновляем ее
+                if (document.getElementById('cart-view').classList.contains('hidden') === false) {
+                    renderCart();
+                }
+            }
+        }
+
+        /**
+         * Удаляет элемент из корзины.
+         * @param {Event} event Объект события.
+         */
+        function removeFromCart(event) {
+            const itemId = event.target.dataset.id;
+            cart.delete(itemId);
+            const originalItem = allMenuItems.find(i => i.id === itemId);
+            if (originalItem) {
+                updateMenuItemControl(originalItem);
+            }
+            updateBottomCartSummary();
+            renderCart();
+        }
+
+        /**
+         * Обновляет нижнюю кнопку с итоговой суммой.
+         */
+        function updateBottomCartSummary() {
+            const total = Array.from(cart.values()).reduce((sum, item) => sum + item.price * item.quantity, 0);
+            if (total > 0) {
+                summaryTotal.textContent = `${total} ₽`;
+                bottomCartSummary.classList.remove('hidden');
+            } else {
+                bottomCartSummary.classList.add('hidden');
+            }
+        }
+        
+        /**
+         * Рендерит содержимое корзины.
+         */
+        function renderCart() {
+            cartItemsContainer.innerHTML = '';
+            
+            if (cart.size === 0) {
+                cartItemsContainer.innerHTML = '<p id="empty-cart-message" class="text-gray-400 italic text-sm md:text-base text-center py-8">Ваша корзина пуста.</p>';
+                placeOrderWrapper.classList.add('hidden');
+            } else {
+                placeOrderWrapper.classList.remove('hidden');
+                
+                cart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    const cartItemHtml = `
+                        <div id="cart-item-${item.id}" class="flex items-center justify-between p-2 bg-[#191919] rounded-xl shadow-md text-sm md:text-base">
+                            <div class="flex items-center gap-2 flex-grow">
+                                <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                                <span class="font-medium flex-grow">${item.name}</span>
+                            </div>
+                            <div class="flex items-center gap-2 flex-shrink-0">
+                                <button class="quantity-btn bg-[#AB3031] text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="decrease">-</button>
+                                <span class="w-6 text-center">${item.quantity}</span>
+                                <button class="quantity-btn bg-[#AB3031] text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="increase">+</button>
+                                <span class="w-16 text-right font-bold">${itemTotal} ₽</span>
+                                <button class="remove-from-cart-btn text-gray-400 hover:text-white transition-colors ml-2" data-id="${item.id}">&times;</button>
+                            </div>
+                        </div>
+                    `;
+                    cartItemsContainer.innerHTML += cartItemHtml;
+                });
+            }
+            
+            // Добавляем слушателей событий к кнопкам корзины
+            document.querySelectorAll('.quantity-btn').forEach(button => {
+                button.addEventListener('click', updateQuantity);
+            });
+            document.querySelectorAll('.remove-from-cart-btn').forEach(button => {
+                button.addEventListener('click', removeFromCart);
             });
         }
 
-        function startStoryTimeout() {
-            clearTimeout(storyTimeout);
-            storyTimeout = setTimeout(() => {
-                showNextStory();
-            }, 5000); // Показываем каждую историю 5 секунд
+        /**
+         * Показывает модальное окно с формой заказа.
+         */
+        function showOrderForm() {
+            if (cart.size === 0) {
+                 // В случае пустой корзины просто ничего не делаем или показываем сообщение
+                 return;
+            }
+            orderFormModal.classList.remove('hidden');
+            orderFormModal.classList.add('modal-enter');
+        }
+        
+        /**
+         * Обрабатывает отправку формы заказа.
+         * @param {Event} event Объект события.
+         */
+        function handleOrderSubmit(event) {
+            event.preventDefault(); // Предотвращаем стандартную отправку формы
+
+            const name = nameInput.value.trim();
+            const phone = phoneInput.value.trim();
+            const pickupTime = pickupTimeSelect.value;
+            
+            // Простая валидация
+            if (!name || !phone) {
+                // Вместо alert()
+                showCustomMessage('Пожалуйста, заполните все поля!');
+                return;
+            }
+
+            // Имитация "оплаты" и "оформления"
+            hideModal(orderFormModal);
+            
+            const total = Array.from(cart.values()).reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            confirmationText.textContent = `Ваш заказ на сумму ${total} ₽ успешно оформлен! По готовности вам придет уведомление в Telegram.`;
+            confirmationModal.classList.remove('hidden');
+            confirmationModal.classList.add('modal-enter');
+
+            // Очищаем корзину и обновляем UI
+            cart.clear();
+            updateBottomCartSummary();
+            // Возвращаемся на страницу меню, но с небольшой задержкой для плавности
+            setTimeout(() => {
+                showView('menu');
+            }, 500);
+            
+            allMenuItems.forEach(item => updateMenuItemControl(item));
         }
 
-        function showNextStory() {
-            currentStoryIndex++;
-            if (currentStoryIndex < stories.length) {
-                showStory(currentStoryIndex);
-            } else {
-                storyModal.classList.add('hidden');
-                clearTimeout(storyTimeout);
-            }
-        }
-
-        function showPrevStory() {
-            currentStoryIndex--;
-            if (currentStoryIndex >= 0) {
-                showStory(currentStoryIndex);
-            } else {
-                currentStoryIndex = 0; // Остаемся на первой истории
-            }
-        }
-
-        closeStoryModalBtn.addEventListener('click', () => {
-            storyModal.classList.add('hidden');
-            clearTimeout(storyTimeout);
-        });
-
-        // Управление свайпами
-        storyModal.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].clientX;
-        });
-
-        storyModal.addEventListener('touchend', e => {
-            const touchEndX = e.changedTouches[0].clientX;
-            const deltaX = touchEndX - touchStartX;
-            const swipeThreshold = 50; // Минимальное расстояние для свайпа
-
-            if (deltaX > swipeThreshold) {
-                showPrevStory();
-            } else if (deltaX < -swipeThreshold) {
-                showNextStory();
-            }
-        });
-
+        /**
+         * Показывает секцию выбранной категории.
+         * @param {string} category Категория, которую нужно показать.
+         */
         function showCategory(category) {
-            menuSections.forEach(section => section.classList.add('hidden'));
-            const sectionToShow = document.getElementById(`${category}-section`);
-            if (sectionToShow) {
-                sectionToShow.classList.remove('hidden');
-            }
+            document.querySelectorAll('.category-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(`${category}-section`).classList.remove('hidden');
+            document.getElementById('no-results').classList.add('hidden');
+            searchInput.value = ''; // Очищаем поле поиска
+            updateCategoryButtons(category);
+        }
 
-            categoryButtons.forEach(btn => {
-                if (btn.dataset.category === category) {
+        /**
+         * Обновляет стили кнопок категорий.
+         * @param {string} activeCategory Активная категория.
+         */
+        function updateCategoryButtons(activeCategory) {
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if (btn.dataset.category === activeCategory) {
                     btn.classList.add('bg-[#AB3031]', 'text-white');
                     btn.classList.remove('bg-gray-800', 'text-gray-700', 'hover:bg-gray-700');
                 } else {
@@ -627,50 +982,99 @@
                 }
             });
         }
-        
-        // Эта функция добавляет правила анимации. Она вызывается после загрузки DOM.
-        function addAnimationRules() {
-            if (document.styleSheets.length > 0) {
-                const styleSheet = document.styleSheets[0];
-                try {
-                    // Проверяем, существует ли правило, прежде чем добавлять
-                    const ruleExists = Array.from(styleSheet.cssRules).some(rule => rule.name === 'progress-fill');
-                    if (!ruleExists) {
-                        styleSheet.insertRule(`
-                            @keyframes progress-fill {
-                                from { width: 0; }
-                                to { width: 100%; }
-                            }
-                        `, styleSheet.cssRules.length);
-                    }
-                    const animateRuleExists = Array.from(styleSheet.cssRules).some(rule => rule.selectorText === '.animate-progress');
-                    if (!animateRuleExists) {
-                        styleSheet.insertRule(`
-                            .animate-progress {
-                                animation: progress-fill 5s linear forwards;
-                            }
-                        `, styleSheet.cssRules.length);
-                    }
-                } catch (e) {
-                    console.error("Failed to insert animation rules:", e);
-                }
-            } else {
-                console.error("No stylesheets found to insert rules into.");
-            }
+
+
+        /**
+         * Применяет фильтры по цене.
+         */
+        function applyFilters() {
+            const minPrice = parseInt(minPriceInput.value) || 0;
+            const maxPrice = parseInt(maxPriceInput.value) || Infinity;
+            
+            const filteredItems = allMenuItems.filter(item =>
+                item.price >= minPrice && item.price <= maxPrice
+            );
+
+            renderFilteredItems(filteredItems);
+            filterModal.classList.add('modal-leave');
+            setTimeout(() => {
+                filterModal.classList.add('hidden');
+                filterModal.classList.remove('modal-leave');
+            }, 300);
         }
-        
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            renderMenuItems(menuItems.burgers, menuLists.burgers, 'burgers');
-            renderMenuItems(menuItems.pizza, menuLists.pizza, 'pizza');
-            renderMenuItems(menuItems.snacks, menuLists.snacks, 'snacks');
-            renderMenuItems(menuItems.drinks, menuLists.drinks, 'drinks');
-            renderCart();
-            renderStories();
-            filterAndSearchMenu();
+
+        /**
+         * Сбрасывает фильтры и показывает все меню.
+         */
+        function clearFilters() {
+            minPriceInput.value = '';
+            maxPriceInput.value = '';
             showCategory('burgers');
-            addAnimationRules(); // Вызываем эту функцию здесь
-        });
+            filterModal.classList.add('modal-leave');
+            setTimeout(() => {
+                filterModal.classList.add('hidden');
+                filterModal.classList.remove('modal-leave');
+            }, 300);
+        }
+
+        /**
+         * Фильтрует и ищет элементы меню.
+         */
+        function filterAndSearchMenu() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const minPrice = parseInt(minPriceInput.value) || 0;
+            const maxPrice = parseInt(maxPriceInput.value) || Infinity;
+
+            const filteredAndSearchedItems = allMenuItems.filter(item =>
+                item.name.toLowerCase().includes(searchTerm) &&
+                item.price >= minPrice && item.price <= maxPrice
+            );
+            
+            renderFilteredItems(filteredAndSearchedItems);
+        }
+
+        /**
+         * Рендерит отфильтрованные элементы в указанном контейнере.
+         */
+        function renderFilteredItems(items) {
+            // Скрываем все секции
+            document.querySelectorAll('.category-section').forEach(section => section.classList.add('hidden'));
+            
+            const groupedItems = items.reduce((acc, item) => {
+                (acc[item.category] = acc[item.category] || []).push(item);
+                return acc;
+            }, {});
+
+            if (items.length > 0) {
+                document.getElementById('no-results').classList.add('hidden');
+                // Рендерим только те категории, которые соответствуют фильтру/поиску
+                Object.keys(groupedItems).forEach(category => {
+                    const section = document.getElementById(`${category}-section`);
+                    const listContainer = document.getElementById(`${category}-list`);
+                    if (section && listContainer) {
+                        section.classList.remove('hidden');
+                        listContainer.innerHTML = ''; // Очищаем старые элементы
+                        groupedItems[category].forEach(item => {
+                             listContainer.innerHTML += `
+                                <div id="item-${item.id}" class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
+                                    <img src="${item.image}" alt="${item.name}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-2 object-cover">
+                                    <h3 class="font-bold text-sm sm:text-base">${item.name}</h3>
+                                    <p class="text-xs sm:text-sm text-gray-400 my-1">${item.price} ₽</p>
+                                    <div id="item-control-${item.id}" class="w-full">
+                                        ${createItemControlHtml(item)}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+                updateCategoryButtons(''); // Сбрасываем выделение категорий
+                
+            } else {
+                document.getElementById('no-results').classList.remove('hidden');
+            }
+            attachMenuItemEventListeners(); // Переприкрепляем слушатели после рендера
+        }
     </script>
 </body>
 </html>
