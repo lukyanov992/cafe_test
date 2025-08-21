@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fast Food Cafe</title>
-    <!-- Tailwind CSS для современного оформления -->
+    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -61,15 +61,12 @@
         .status-step {
             position: relative;
             z-index: 10;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1rem;
+            height: 1rem;
             border-radius: 9999px;
             background-color: #4a5568; /* bg-gray-600 */
             transition: all 0.3s ease-in-out;
             border: 2px solid transparent;
-        }
-        .status-step.completed {
-            background-color: #10b981; /* bg-green-500 */
         }
         .status-line {
             position: absolute;
@@ -77,22 +74,34 @@
             transform: translateY(-50%);
             height: 4px;
             background-color: #4a5568; /* bg-gray-600 */
-            transition: all 0.3s ease-in-out;
+            transition: all 0.5s ease-in-out;
             z-index: 5;
         }
-        .status-line.completed {
-            background-color: #10b981; /* bg-green-500 */
-        }
+        
         .status-label {
             position: absolute;
-            top: 2rem;
-            font-size: 0.75rem;
+            top: 1.5rem;
+            font-size: 0.65rem;
             text-align: center;
             white-space: nowrap;
             color: #a0aec0; /* text-gray-400 */
+            width: 80px; /* Фиксированная ширина для центрирования */
+            left: 50%;
+            transform: translateX(-50%);
         }
-        .status-label.completed {
+        
+        .status-label.active {
             color: #10b981; /* text-green-500 */
+        }
+        
+        /* Анимация заполнения прогресс-бара */
+        .progress-fill-animation {
+            animation: progress-fill 3s ease-out forwards;
+        }
+        
+        @keyframes progress-fill {
+            from { width: 0%; }
+            to { width: 100%; }
         }
         
         /* Стили для нижней панели корзины */
@@ -210,7 +219,7 @@
                 <!-- Секция "Добавить к заказу" -->
                 <section id="suggested-items-section" class="mt-6 hidden">
                     <h3 class="text-lg font-bold mb-4">Добавить к заказу</h3>
-                    <div id="suggested-items-list" class="grid grid-cols-2 gap-4">
+                    <div id="suggested-items-list" class="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
                         <!-- Здесь будут предложенные товары -->
                     </div>
                 </section>
@@ -267,6 +276,12 @@
         <span id="bottom-cart-total-sum" class="font-bold text-lg">0 ₽</span>
     </button>
     
+    <!-- Кнопка "На главную" (по умолчанию скрыта) -->
+    <button id="back-to-main-btn" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>На главную</span>
+    </button>
+
     <!-- Модальное окно самовывоза -->
     <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
@@ -295,6 +310,57 @@
                 <button id="close-order-form-btn" class="text-gray-400 hover:text-white transition-colors text-3xl leading-none">&times;</button>
             </div>
             <form id="order-form" class="space-y-4">
+                
+                <!-- Способ получения -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Способ получения</label>
+                    <div class="flex gap-2">
+                        <button type="button" data-method="на подносе" class="delivery-method-btn w-1/2 py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-[#AB3031] text-white">
+                            На подносе
+                        </button>
+                        <button type="button" data-method="самовывоз" class="delivery-method-btn w-1/2 py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">
+                            Самовывоз
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Время выдачи -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Время выдачи</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" data-time="asap" class="pickup-time-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-[#AB3031] text-white">
+                            Как можно раньше
+                        </button>
+                        <button type="button" data-time="15min" class="pickup-time-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">
+                            + 15 мин
+                        </button>
+                        <button type="button" data-time="30min" class="pickup-time-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">
+                            + 30 мин
+                        </button>
+                        <button type="button" data-time="custom" class="pickup-time-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">
+                            Другое время
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="custom-time-container" class="hidden">
+                     <label for="custom-time" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Укажите время</label>
+                     <input type="time" id="custom-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                </div>
+
+                <!-- Способ оплаты -->
+                <div>
+                    <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Способ оплаты</label>
+                    <div class="flex gap-2">
+                        <button type="button" data-payment="card" class="payment-method-btn w-1/2 py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-[#AB3031] text-white">
+                            Картой / СБП
+                        </button>
+                        <button type="button" data-payment="cash" class="payment-method-btn w-1/2 py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">
+                            Наличные
+                        </button>
+                    </div>
+                </div>
+
                 <div>
                     <label for="name" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Имя</label>
                     <input type="text" id="name" placeholder="Ваше имя" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
@@ -304,19 +370,7 @@
                     <input type="tel" id="phone" placeholder="+7 (XXX) XXX-XX-XX" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
                     <p id="order-phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Используйте +7 (XXX) XXX-XX-XX.</p>
                 </div>
-                <div>
-                    <label for="pickup-time" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Когда заберете</label>
-                    <select id="pickup-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
-                        <option value="now">Сейчас</option>
-                        <option value="30min">Через 30 мин</option>
-                        <option value="1hour">Через час</option>
-                        <option value="custom">Ко времени</option>
-                    </select>
-                </div>
-                <div id="custom-time-container" class="hidden">
-                     <label for="custom-time" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Укажите время</label>
-                     <input type="time" id="custom-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
-                </div>
+                
                 <button type="submit" id="pay-button" class="w-full bg-[#AB3031] text-white py-3 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C]">
                     Оплатить
                 </button>
@@ -359,7 +413,7 @@
     </div>
 
     <script>
-        // Данные для элементов меню
+        // Data for menu items
         const menuItems = {
             burgers: [
                 { id: 'burger_1', name: 'Классический бургер', price: 350, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер', category: 'burgers' },
@@ -385,7 +439,7 @@
 
         const allMenuItems = Object.values(menuItems).flat();
 
-        // Данные для историй
+        // Data for stories
         const storyData = [
             {
                 image: 'https://placehold.co/900x1600/AB3031/ffffff?text=Новый+комбо-набор',
@@ -401,10 +455,13 @@
             }
         ];
         
-        // Карта для хранения корзины
+        // Cart data storage (Map for efficiency)
         let cart = new Map();
+        
+        // Store phone number input state to handle backspace
+        let lastPhoneLength = 0;
 
-        // DOM элементы
+        // DOM elements
         const pickupButton = document.getElementById('pickup-button');
         const categoryTabs = document.getElementById('category-tabs');
         const storyContainer = document.getElementById('story-container');
@@ -420,6 +477,7 @@
         const cartPickupLocation = document.getElementById('cart-pickup-location');
         const suggestedItemsList = document.getElementById('suggested-items-list');
         const suggestedItemsSection = document.getElementById('suggested-items-section');
+        const backToMainBtn = document.getElementById('back-to-main-btn');
         
         const pickupModal = document.getElementById('pickup-modal');
         const storyModal = document.getElementById('story-modal');
@@ -437,17 +495,16 @@
         const nextStoryBtn = document.getElementById('next-story-btn');
         const pickupLocations = document.getElementById('pickup-locations');
         
-        // Элементы формы заказа
+        // Order form elements
         const orderForm = document.getElementById('order-form');
         const nameInput = document.getElementById('name');
         const phoneInput = document.getElementById('phone');
         const orderPhoneValidationMsg = document.getElementById('order-phone-validation-message');
-        const pickupTimeSelect = document.getElementById('pickup-time');
         const customTimeContainer = document.getElementById('custom-time-container');
         const customTimeInput = document.getElementById('custom-time');
         const confirmationText = document.getElementById('confirmation-text');
         
-        // Элементы профиля
+        // Profile elements
         const profileNameInput = document.getElementById('profile-name');
         const profilePhoneInput = document.getElementById('profile-phone');
         const profilePhoneValidationMsg = document.getElementById('phone-validation-message');
@@ -464,10 +521,21 @@
         const pickupAddresses = document.querySelectorAll('.pickup-location-btn');
         let currentPickupLocation = "Москва, Тверская улица, 15";
         
-        // Регулярное выражение для российской валидации номера телефона (+7 (XXX) XXX-XX-XX)
+        // Regex for Russian phone number validation (+7 (XXX) XXX-XX-XX)
         const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+        
+        // Animation variables
+        const STATUS_TRANSITION_DURATION = 3000; // 3 seconds per stage
 
-        // Инициализация
+        // Initialize state variables for the order form
+        let selectedDeliveryMethod = 'на подносе';
+        let selectedPaymentMethod = 'card';
+        let selectedPickupTime = 'asap';
+        
+        // Keeps track of ongoing animations to prevent duplicates
+        const activeAnimations = new Map();
+
+        // Initialize on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
             renderStories();
             renderAllMenuItems();
@@ -475,12 +543,13 @@
             showView('menu');
             updateCategoryButtons('burgers');
             setInitialPickupLocation();
+            updateOrderFormUI();
         });
         
         /**
-         * Форматирует номер телефона в российский формат +7 (XXX) XXX-XX-XX
-         * @param {string} rawNumber Сырой номер (только цифры).
-         * @returns {string} Отформатированный номер.
+         * Formats a raw number into a Russian phone number format.
+         * @param {string} rawNumber Raw digits.
+         * @returns {string} Formatted number.
          */
         function formatPhoneNumber(rawNumber) {
             const digits = rawNumber.replace(/\D/g, '');
@@ -503,26 +572,31 @@
         }
         
         /**
-         * Обработчик события input для форматирования номера телефона.
-         * @param {Event} e Событие input.
+         * Input event handler for phone number formatting.
+         * @param {Event} e The input event.
          */
         function handlePhoneInput(e) {
             const input = e.target;
             const rawValue = input.value.replace(/\D/g, '');
             let start = input.selectionStart;
+            const newLength = rawValue.length;
+
+            if (newLength < lastPhoneLength) {
+                lastPhoneLength = newLength;
+                return; // Let backspace and delete work as intended
+            }
+            lastPhoneLength = newLength;
+
             let oldLength = input.value.length;
-            
             input.value = formatPhoneNumber(rawValue);
-            
-            // Корректировка позиции курсора
-            let newLength = input.value.length;
-            let diff = newLength - oldLength;
+
+            let diff = input.value.length - oldLength;
             if (start !== null) {
                 input.setSelectionRange(start + diff, start + diff);
             }
         }
 
-        // Слушатели событий
+        // Event listeners
         function attachEventListeners() {
             pickupButton.addEventListener('click', () => {
                 pickupModal.classList.remove('hidden');
@@ -536,15 +610,15 @@
                 }, 300);
             });
 
-            // Обработка выбора точки самовывоза
+            // Handle pickup location selection
             pickupLocations.addEventListener('click', (e) => {
                 const targetButton = e.target.closest('.pickup-location-btn');
                 if (targetButton) {
-                    // Снимаем выделение со всех
+                    // Remove active style from all
                     pickupAddresses.forEach(btn => btn.classList.remove('bg-gray-700'));
                     pickupAddresses.forEach(btn => btn.classList.add('bg-gray-800', 'hover:bg-gray-700'));
                     
-                    // Выделяем выбранную
+                    // Add active style to selected
                     targetButton.classList.remove('bg-gray-800', 'hover:bg-gray-700');
                     targetButton.classList.add('bg-gray-700');
                     
@@ -559,44 +633,54 @@
                 }
             });
 
-            // Слушатель для кнопки "Оформить заказ"
+            // Place order button listener
             placeOrderBtn.addEventListener('click', showOrderForm);
             
-            // Слушатели для модальных окон
+            // Modal listeners
             closeStoryModalBtn.addEventListener('click', () => hideModal(storyModal));
             closeOrderFormBtn.addEventListener('click', () => hideModal(orderFormModal));
             closeConfirmationBtn.addEventListener('click', () => hideModal(confirmationModal));
 
-            // Навигация по историям
+            // Story navigation
             prevStoryBtn.addEventListener('click', showPrevStory);
             nextStoryBtn.addEventListener('click', showNextStory);
-
-            // Слушатель для изменения времени самовывоза
-            pickupTimeSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'custom') {
-                    customTimeContainer.classList.remove('hidden');
-                } else {
-                    customTimeContainer.classList.add('hidden');
-                }
+            
+            // Order form button listeners
+            document.querySelectorAll('.delivery-method-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => updateOrderFormButtons(e.target, 'delivery-method-btn', (val) => selectedDeliveryMethod = val));
+            });
+            document.querySelectorAll('.pickup-time-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    updateOrderFormButtons(e.target, 'pickup-time-btn', (val) => selectedPickupTime = val);
+                    if (e.target.dataset.time === 'custom') {
+                        customTimeContainer.classList.remove('hidden');
+                    } else {
+                        customTimeContainer.classList.add('hidden');
+                    }
+                });
+            });
+            document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => updateOrderFormButtons(e.target, 'payment-method-btn', (val) => selectedPaymentMethod = val));
             });
             
-            // Слушатель для отправки формы заказа
+            // Order form submission
             orderForm.addEventListener('submit', handleOrderSubmit);
             
-            // Слушатель для редактирования профиля
+            // Profile editing listener
             editProfileBtn.addEventListener('click', toggleProfileEdit);
             
-            // Слушатели для форматирования телефона
+            // Phone number formatting listeners
             profilePhoneInput.addEventListener('input', handlePhoneInput);
             phoneInput.addEventListener('input', handlePhoneInput);
 
-            // Новый слушатель для кнопки профиля в правом верхнем углу
+            // Top right profile button
             topProfileBtn.addEventListener('click', () => showView('profile'));
             
-            // Новый слушатель для нижней панели корзины
+            // Bottom cart menu and Back to Main button listeners
             bottomCartMenu.addEventListener('click', () => showView('cart'));
+            backToMainBtn.addEventListener('click', () => showView('menu'));
 
-            // Слушатель для кнопок категорий
+            // Category buttons
             categoryTabs.addEventListener('click', (e) => {
                 const button = e.target.closest('.category-btn');
                 if (button) {
@@ -607,24 +691,40 @@
         }
         
         /**
-         * Валидирует номер телефона по российскому формату.
-         * @param {string} phone Номер телефона для проверки.
-         * @returns {boolean} Результат валидации.
+         * Updates the style of buttons in the order form.
+         * @param {HTMLElement} activeBtn The clicked button.
+         * @param {string} className The class name for the buttons.
+         * @param {Function} stateSetter A function to set the corresponding state variable.
+         */
+        function updateOrderFormButtons(activeBtn, className, stateSetter) {
+            document.querySelectorAll(`.${className}`).forEach(btn => {
+                btn.classList.remove('bg-[#AB3031]', 'text-white');
+                btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+            });
+            activeBtn.classList.add('bg-[#AB3031]', 'text-white');
+            activeBtn.classList.remove('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+            stateSetter(activeBtn.dataset[activeBtn.dataset.time ? 'time' : activeBtn.dataset.method ? 'method' : 'payment']);
+        }
+
+        /**
+         * Validates a phone number using the Russian format regex.
+         * @param {string} phone The phone number to validate.
+         * @returns {boolean} Validation result.
          */
         function validateRussianPhone(phone) {
             return phoneRegex.test(phone);
         }
         
         /**
-         * Переключает режим редактирования профиля.
+         * Toggles profile editing mode.
          */
         function toggleProfileEdit() {
             if (isProfileEditing) {
-                // Режим сохранения
+                // Save mode
                 const newName = profileNameInput.value.trim();
                 const newPhone = profilePhoneInput.value.trim();
                 
-                // Проверяем валидность телефона перед сохранением
+                // Validate phone before saving
                 if (!validateRussianPhone(newPhone)) {
                     profilePhoneValidationMsg.classList.remove('hidden');
                     return;
@@ -636,11 +736,11 @@
                 saveProfileText.classList.add('hidden');
                 isProfileEditing = false;
                 
-                // Сохраняем данные в localStorage
+                // Save data to localStorage
                 saveUserData(newName, newPhone);
                 
             } else {
-                // Режим редактирования
+                // Edit mode
                 profileNameInput.removeAttribute('readonly');
                 profilePhoneInput.removeAttribute('readonly');
                 editProfileText.classList.add('hidden');
@@ -651,7 +751,7 @@
         }
         
         /**
-         * Устанавливает начальное место самовывоза.
+         * Sets the initial pickup location.
          */
         function setInitialPickupLocation() {
             if (pickupAddresses.length > 0) {
@@ -662,8 +762,8 @@
         }
         
         /**
-         * Загружает данные пользователя из localStorage.
-         * @returns {object|null} Объект с данными пользователя или null.
+         * Loads user data from localStorage.
+         * @returns {object|null} User data object or null.
          */
         function loadUserData() {
             const userData = localStorage.getItem('userData');
@@ -671,17 +771,17 @@
         }
 
         /**
-         * Сохраняет данные пользователя в localStorage.
-         * @param {string} name Имя пользователя.
-         * @param {string} phone Номер телефона пользователя.
+         * Saves user data to localStorage.
+         * @param {string} name User's name.
+         * @param {string} phone User's phone number.
          */
         function saveUserData(name, phone) {
             localStorage.setItem('userData', JSON.stringify({ name, phone }));
         }
         
         /**
-         * Загружает историю заказов из localStorage.
-         * @returns {Array} Массив с историей заказов.
+         * Loads order history from localStorage.
+         * @returns {Array} Array of order history.
          */
         function loadOrderHistory() {
             const history = localStorage.getItem('orderHistory');
@@ -689,23 +789,23 @@
         }
         
         /**
-         * Сохраняет историю заказов в localStorage.
-         * @param {Array} history Массив с историей заказов.
+         * Saves order history to localStorage.
+         * @param {Array} history Array of order history.
          */
         function saveOrderHistory(history) {
             localStorage.setItem('orderHistory', JSON.stringify(history));
         }
         
         /**
-         * Генерирует случайный 5-значный номер заказа.
-         * @returns {number} Случайный номер заказа.
+         * Generates a random 5-digit order number.
+         * @returns {number} Random order number.
          */
         function generateOrderNumber() {
             return Math.floor(10000 + Math.random() * 90000);
         }
 
         /**
-         * Обновляет UI профиля на основе данных из localStorage.
+         * Updates the profile UI based on localStorage data.
          */
         function updateProfileUI() {
             const userData = loadUserData();
@@ -720,7 +820,7 @@
         }
 
         /**
-         * Рендерит историю заказов.
+         * Renders the order history.
          */
         function renderOrderHistory() {
             const history = loadOrderHistory();
@@ -739,59 +839,137 @@
                 `).join('');
                 
                 const orderCard = `
-                    <div class="bg-gray-800 p-3 rounded-xl shadow-md">
+                    <div class="bg-gray-800 p-3 rounded-xl shadow-md" data-order-number="${order.orderNumber}">
                         <div class="flex justify-between items-center mb-2 font-bold text-sm">
                             <span>Заказ № ${order.orderNumber}</span>
                             <span>${order.total} ₽</span>
                         </div>
                         <div class="text-xs text-gray-400 mb-2">
+                            <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${order.paymentMethod}</span><br>
                             <span>Место: ${order.location}</span> | <span>Дата: ${order.date}</span> | <span>Время: ${order.time}</span>
                         </div>
                         <ul class="space-y-1 text-sm md:text-base mb-4">
                             ${itemsList}
                         </ul>
-                        <!-- Прогресс-бар заказа -->
-                        <div class="order-status-bar">
-                            <div class="status-line left-0 w-1/2 completed"></div>
-                            <div class="status-line left-1/2 w-1/2"></div>
-                            <div class="status-step completed">
-                                <span class="status-label left-1/2 -translate-x-1/2">Принят</span>
+                        <!-- Order progress bar -->
+                        <div class="order-status-bar relative w-full mb-8">
+                            <div class="status-line h-1 bg-[#10b981] rounded-full" id="progress-line-${order.orderNumber}" style="width: 0%;"></div>
+                            <div class="status-step-container relative flex justify-between z-10">
+                                <div class="status-step w-4 h-4 rounded-full bg-[#10b981]"></div>
+                                <div class="status-step w-4 h-4 rounded-full bg-gray-600" id="step-preparing-${order.orderNumber}"></div>
+                                <div class="status-step w-4 h-4 rounded-full bg-gray-600" id="step-ready-${order.orderNumber}"></div>
                             </div>
-                            <div class="status-step completed">
-                                <span class="status-label left-1/2 -translate-x-1/2">Готовится</span>
-                            </div>
-                            <div class="status-step completed">
-                                <span class="status-label left-1/2 -translate-x-1/2">Готов</span>
+                            <div class="status-label-container flex justify-between absolute w-full top-6">
+                                <span class="text-xs text-center text-[#10b981]">Принят</span>
+                                <span class="text-xs text-center text-gray-400" id="label-preparing-${order.orderNumber}">Готовится</span>
+                                <span class="text-xs text-center text-gray-400" id="label-ready-${order.orderNumber}">Готов</span>
                             </div>
                         </div>
                     </div>
                 `;
                 orderHistoryContainer.innerHTML += orderCard;
             });
+            
+            // Start animations for each order
+            history.forEach(order => {
+                const orderDate = new Date(order.timestamp);
+                const timeSinceOrder = new Date() - orderDate;
+                animateOrderProgress(order.orderNumber, timeSinceOrder);
+            });
         }
         
         /**
-         * Переключает отображаемый вид (меню, корзина, профиль).
-         * @param {string} viewName Имя вида ('menu', 'cart', 'profile').
+         * Animates the order progress bar.
+         * @param {string} orderNumber The order number.
+         * @param {number} elapsedTime The time elapsed since the order was placed in milliseconds.
+         */
+        function animateOrderProgress(orderNumber, elapsedTime) {
+            const progressLine = document.getElementById(`progress-line-${orderNumber}`);
+            const stepPreparing = document.getElementById(`step-preparing-${orderNumber}`);
+            const stepReady = document.getElementById(`step-ready-${orderNumber}`);
+            const labelPreparing = document.getElementById(`label-preparing-${orderNumber}`);
+            const labelReady = document.getElementById(`label-ready-${orderNumber}`);
+
+            if (!progressLine) return; // Guard against non-existent elements
+
+            // Check if animation is already running
+            if (activeAnimations.has(orderNumber)) {
+                return;
+            }
+
+            let startTimestamp = null;
+            let currentStatus = 'accepted';
+            let progress = 0;
+            let totalTime = 0;
+
+            const updateProgress = (timestamp) => {
+                if (!startTimestamp) {
+                    startTimestamp = timestamp;
+                }
+                
+                const elapsed = timestamp - startTimestamp;
+                let currentProgress = (elapsed + elapsedTime) / STATUS_TRANSITION_DURATION;
+
+                if (currentStatus === 'accepted') {
+                    progress = Math.min(currentProgress * 50, 50);
+                    if (progress === 50) {
+                        currentStatus = 'preparing';
+                        stepPreparing.classList.remove('bg-gray-600');
+                        stepPreparing.classList.add('bg-[#10b981]');
+                        labelPreparing.classList.add('text-[#10b981]');
+                        startTimestamp = timestamp;
+                    }
+                } else if (currentStatus === 'preparing') {
+                    progress = Math.min(50 + (currentProgress * 50), 100);
+                    if (progress === 100) {
+                        currentStatus = 'ready';
+                        stepReady.classList.remove('bg-gray-600');
+                        stepReady.classList.add('bg-[#10b981]');
+                        labelReady.classList.add('text-[#10b981]');
+                    }
+                } else if (currentStatus === 'ready') {
+                    progress = 100;
+                }
+
+                progressLine.style.width = `${progress}%`;
+
+                if (progress < 100) {
+                    activeAnimations.set(orderNumber, requestAnimationFrame(updateProgress));
+                } else {
+                    activeAnimations.delete(orderNumber);
+                }
+            };
+
+            activeAnimations.set(orderNumber, requestAnimationFrame(updateProgress));
+        }
+
+        /**
+         * Switches the active view (menu, cart, profile).
+         * @param {string} viewName The name of the view to show ('menu', 'cart', 'profile').
          */
         function showView(viewName) {
             menuView.classList.add('hidden');
             cartView.classList.add('hidden');
             profileView.classList.add('hidden');
-            
+            bottomCartMenu.classList.remove('visible');
+            backToMainBtn.classList.add('hidden');
+
             if (viewName === 'menu') {
                 menuView.classList.remove('hidden');
+                updateBottomCartMenu();
             } else if (viewName === 'cart') {
                 cartView.classList.remove('hidden');
+                backToMainBtn.classList.remove('hidden');
                 renderCart();
             } else if (viewName === 'profile') {
                 profileView.classList.remove('hidden');
+                backToMainBtn.classList.remove('hidden');
                 updateProfileUI();
             }
         }
 
         /**
-         * Рендерит истории на главной странице.
+         * Renders stories on the main page.
          */
         function renderStories() {
             storyContainer.innerHTML = storyData.map((story, index) => `
@@ -811,8 +989,8 @@
         }
 
         /**
-         * Отображает модальное окно истории.
-         * @param {number} index Индекс истории для отображения.
+         * Displays the story modal.
+         * @param {number} index The index of the story to display.
          */
         function showStory(index) {
             currentStoryIndex = index;
@@ -823,13 +1001,13 @@
             storyModal.classList.add('modal-enter');
             updateStoryIndicators();
             
-            // Запускаем прогресс-бар
+            // Start progress bar animation
             startStoryProgress();
         }
         
         /**
-         * Скрывает любое модальное окно.
-         * @param {HTMLElement} modalElement Элемент модального окна для скрытия.
+         * Hides any modal window.
+         * @param {HTMLElement} modalElement The modal element to hide.
          */
         function hideModal(modalElement) {
             modalElement.classList.add('modal-leave');
@@ -843,7 +1021,7 @@
         }
 
         /**
-         * Запускает анимацию прогресса истории.
+         * Starts the story progress animation.
          */
         function startStoryProgress() {
             clearInterval(storyProgressInterval);
@@ -855,11 +1033,11 @@
             
             storyProgressInterval = setTimeout(() => {
                 showNextStory();
-            }, 5000); // Переключаем историю через 5 секунд
+            }, 5000); // Switch story after 5 seconds
         }
 
         /**
-         * Показывает следующую историю.
+         * Shows the next story.
          */
         function showNextStory() {
             currentStoryIndex = (currentStoryIndex + 1) % storyData.length;
@@ -867,7 +1045,7 @@
         }
 
         /**
-         * Показывает предыдущую историю.
+         * Shows the previous story.
          */
         function showPrevStory() {
             currentStoryIndex = (currentStoryIndex - 1 + storyData.length) % storyData.length;
@@ -875,7 +1053,7 @@
         }
         
         /**
-         * Обновляет индикаторы прогресса историй.
+         * Updates story progress indicators.
          */
         function updateStoryIndicators() {
             storyProgressContainer.innerHTML = storyData.map((_, index) => `
@@ -886,9 +1064,9 @@
         }
         
         /**
-         * Создает HTML-разметку для блока управления товаром (кнопка добавления или счетчик).
-         * @param {object} item Объект элемента меню.
-         * @returns {string} HTML-разметка.
+         * Creates HTML for the item control (add button or quantity counter).
+         * @param {object} item The menu item object.
+         * @returns {string} The HTML markup.
          */
         function createItemControlHtml(item) {
             const cartItem = cart.get(item.id);
@@ -914,13 +1092,13 @@
         }
 
         /**
-         * Рендерит все элементы меню.
+         * Renders all menu items.
          */
         function renderAllMenuItems() {
             Object.keys(menuItems).forEach(category => {
                 const listContainer = document.getElementById(`${category}-list`);
                 if (listContainer) {
-                    listContainer.innerHTML = ''; // Очищаем контейнер перед рендерингом
+                    listContainer.innerHTML = ''; // Clear container before rendering
                     menuItems[category].forEach(item => {
                         listContainer.innerHTML += `
                             <div id="item-${item.id}" class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
@@ -939,16 +1117,16 @@
         }
         
         /**
-         * Прикрепляет слушатели событий к кнопкам меню.
+         * Attaches event listeners to menu item buttons.
          */
         function attachMenuItemEventListeners() {
-            // Убираем старые слушатели, чтобы избежать дублирования
+            // Remove old listeners to prevent duplication
             document.querySelectorAll('.add-to-cart-btn, .quantity-btn').forEach(btn => {
                 const newBtn = btn.cloneNode(true);
                 btn.parentNode.replaceChild(newBtn, btn);
             });
 
-            // Добавляем новые слушатели
+            // Add new listeners
             document.querySelectorAll('.add-to-cart-btn').forEach(button => {
                 button.addEventListener('click', addToCart);
             });
@@ -958,20 +1136,20 @@
         }
         
         /**
-         * Обновляет HTML-разметку блока управления одного элемента меню.
-         * @param {object} item Объект элемента меню.
+         * Updates the HTML markup for a single menu item's control block.
+         * @param {object} item The menu item object.
          */
         function updateMenuItemControl(item) {
             const controlElement = document.getElementById(`item-control-${item.id}`);
             if (controlElement) {
                 controlElement.innerHTML = createItemControlHtml(item);
-                attachMenuItemEventListeners(); // Переприкрепляем слушатели
+                attachMenuItemEventListeners(); // Re-attach listeners
             }
         }
 
         /**
-         * Добавляет элемент в корзину и обновляет UI.
-         * @param {Event} event Объект события.
+         * Adds an item to the cart and updates the UI.
+         * @param {Event} event The event object.
          */
         function addToCart(event) {
             const itemId = event.target.dataset.id;
@@ -985,8 +1163,8 @@
         }
 
         /**
-         * Обновляет количество товара в корзине и обновляет UI.
-         * @param {Event} event Объект события.
+         * Updates the quantity of an item in the cart and updates the UI.
+         * @param {Event} event The event object.
          */
         function updateQuantity(event) {
             const itemId = event.target.dataset.id;
@@ -1006,7 +1184,7 @@
                     updateMenuItemControl(originalItem);
                 }
                 updateBottomCartMenu();
-                // Если мы находимся на странице корзины, обновляем ее
+                // If we are on the cart page, re-render it
                 if (cartView.classList.contains('hidden') === false) {
                     renderCart();
                 }
@@ -1014,8 +1192,8 @@
         }
 
         /**
-         * Удаляет элемент из корзины.
-         * @param {Event} event Объект события.
+         * Removes an item from the cart.
+         * @param {Event} event The event object.
          */
         function removeFromCart(event) {
             const itemId = event.target.dataset.id;
@@ -1026,14 +1204,14 @@
             }
             updateBottomCartMenu();
             renderCart();
-            // Если корзина пуста, автоматически закрываем её
+            // If cart is empty, automatically close it
             if (cart.size === 0) {
                 showView('menu');
             }
         }
 
         /**
-         * Обновляет видимость и сумму в нижней панели корзины.
+         * Updates the visibility and total sum of the bottom cart menu.
          */
         function updateBottomCartMenu() {
             if (cart.size > 0) {
@@ -1046,7 +1224,7 @@
         }
         
         /**
-         * Рендерит содержимое корзины.
+         * Renders the cart content.
          */
         function renderCart() {
             cartItemsContainer.innerHTML = '';
@@ -1067,9 +1245,9 @@
                                 <span class="font-medium flex-grow">${item.name}</span>
                             </div>
                             <div class="flex items-center gap-2 flex-shrink-0">
-                                <button class="quantity-btn bg-[#AB3031] text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="decrease">-</button>
+                                <button class="quantity-btn w-6 h-6 rounded-full flex items-center justify-center bg-[#AB3031] text-white hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="decrease">-</button>
                                 <span class="w-6 text-center">${item.quantity}</span>
-                                <button class="quantity-btn bg-[#AB3031] text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="increase">+</button>
+                                <button class="quantity-btn w-6 h-6 rounded-full flex items-center justify-center bg-[#AB3031] text-white hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="increase">+</button>
                                 <span class="w-16 text-right font-bold">${itemTotal} ₽</span>
                                 <button class="remove-from-cart-btn text-gray-400 hover:text-white transition-colors ml-2" data-id="${item.id}">&times;</button>
                             </div>
@@ -1078,11 +1256,11 @@
                     cartItemsContainer.innerHTML += cartItemHtml;
                 });
                 
-                // Рендерим предложенные товары
+                // Render suggested items
                 renderSuggestedItems();
             }
             
-            // Добавляем слушателей событий к кнопкам корзины
+            // Add listeners to cart buttons
             document.querySelectorAll('.quantity-btn').forEach(button => {
                 button.addEventListener('click', updateQuantity);
             });
@@ -1092,7 +1270,7 @@
         }
         
         /**
-         * Рендерит предложенные товары.
+         * Renders suggested items.
          */
         function renderSuggestedItems() {
             const cartItemIds = Array.from(cart.keys());
@@ -1101,7 +1279,7 @@
             if (suggestedItems.length > 0) {
                 suggestedItemsSection.classList.remove('hidden');
                 suggestedItemsList.innerHTML = suggestedItems.slice(0, 4).map(item => `
-                    <div class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
+                    <div class="flex-shrink-0 w-36 bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
                         <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-full mb-2 object-cover">
                         <h3 class="font-bold text-sm">${item.name}</h3>
                         <p class="text-xs text-gray-400 my-1">${item.price} ₽</p>
@@ -1115,7 +1293,7 @@
                 document.querySelectorAll('#suggested-items-list .add-to-cart-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         addToCart(e);
-                        // После добавления из предложений, обновляем и саму корзину
+                        // After adding from suggestions, update the cart itself
                         renderCart(); 
                     });
                 });
@@ -1125,7 +1303,48 @@
         }
         
         /**
-         * Показывает модальное окно с формой заказа.
+         * Updates the UI of the order form buttons based on state.
+         */
+        function updateOrderFormUI() {
+             // Handle delivery method buttons
+             document.querySelectorAll('.delivery-method-btn').forEach(btn => {
+                 btn.classList.remove('bg-[#AB3031]', 'bg-gray-800', 'hover:bg-gray-700', 'text-white');
+                 if (btn.dataset.method === selectedDeliveryMethod) {
+                     btn.classList.add('bg-[#AB3031]', 'text-white');
+                 } else {
+                     btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+                 }
+             });
+
+             // Handle pickup time buttons
+             document.querySelectorAll('.pickup-time-btn').forEach(btn => {
+                 btn.classList.remove('bg-[#AB3031]', 'bg-gray-800', 'hover:bg-gray-700', 'text-white');
+                 if (btn.dataset.time === selectedPickupTime) {
+                     btn.classList.add('bg-[#AB3031]', 'text-white');
+                 } else {
+                     btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+                 }
+             });
+             // Show/hide custom time container
+             if (selectedPickupTime === 'custom') {
+                 customTimeContainer.classList.remove('hidden');
+             } else {
+                 customTimeContainer.classList.add('hidden');
+             }
+
+             // Handle payment method buttons
+             document.querySelectorAll('.payment-method-btn').forEach(btn => {
+                 btn.classList.remove('bg-[#AB3031]', 'bg-gray-800', 'hover:bg-gray-700', 'text-white');
+                 if (btn.dataset.payment === selectedPaymentMethod) {
+                     btn.classList.add('bg-[#AB3031]', 'text-white');
+                 } else {
+                     btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+                 }
+             });
+        }
+
+        /**
+         * Shows the order form modal.
          */
         function showOrderForm() {
             if (cart.size === 0) {
@@ -1138,11 +1357,12 @@
             }
             orderFormModal.classList.remove('hidden');
             orderFormModal.classList.add('modal-enter');
+            updateOrderFormUI();
         }
         
         /**
-         * Обрабатывает отправку формы заказа.
-         * @param {Event} event Объект события.
+         * Handles the order form submission.
+         * @param {Event} event The event object.
          */
         function handleOrderSubmit(event) {
             event.preventDefault();
@@ -1150,12 +1370,12 @@
             const name = nameInput.value.trim();
             const phone = phoneInput.value.trim();
             
-            // Простая валидация
+            // Simple validation
             if (!name || !phone) {
                 return;
             }
             
-            // Валидация российского номера телефона
+            // Russian phone number validation
             if (!validateRussianPhone(phone)) {
                 orderPhoneValidationMsg.classList.remove('hidden');
                 return;
@@ -1163,36 +1383,52 @@
             
             orderPhoneValidationMsg.classList.add('hidden');
 
-            // Имитация "оплаты" и "оформления"
+            // Get selected pickup time
+            let finalPickupTime = 'Сейчас';
+            if (selectedPickupTime === 'asap') {
+                finalPickupTime = 'Как можно раньше';
+            } else if (selectedPickupTime === '15min') {
+                finalPickupTime = 'Через 15 мин';
+            } else if (selectedPickupTime === '30min') {
+                finalPickupTime = 'Через 30 мин';
+            } else if (selectedPickupTime === 'custom') {
+                finalPickupTime = `К ${customTimeInput.value}`;
+            }
+
             hideModal(orderFormModal);
             
             const total = Array.from(cart.values()).reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-            // Сохраняем данные пользователя
+            
+            // Save user data
             saveUserData(name, phone);
             
-            // Сохраняем историю заказа
+            // Save order history
             const orderHistory = loadOrderHistory();
             const now = new Date();
             const orderDetails = {
                 orderNumber: generateOrderNumber(),
+                deliveryMethod: selectedDeliveryMethod,
+                paymentMethod: selectedPaymentMethod,
+                pickupTime: finalPickupTime,
                 location: currentPickupLocation,
                 date: now.toLocaleDateString('ru-RU'),
                 time: now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                 items: Array.from(cart.values()),
-                total: total
+                total: total,
+                status: 'accepted',
+                timestamp: now.getTime()
             };
-            orderHistory.push(orderDetails);
+            orderHistory.unshift(orderDetails); // Add to the beginning of the array
             saveOrderHistory(orderHistory);
 
-            confirmationText.textContent = `Ваш заказ на сумму ${total} ₽ успешно оформлен! По готовности вам придет уведомление в Telegram.`;
+            confirmationText.textContent = `Ваш заказ на сумму ${total} ₽ успешно оформлен! По готовности вам придет уведомление.`;
             confirmationModal.classList.remove('hidden');
             confirmationModal.classList.add('modal-enter');
 
-            // Очищаем корзину и обновляем UI
+            // Clear cart and update UI
             cart.clear();
             updateBottomCartMenu();
-            // Возвращаемся на страницу меню, но с небольшой задержкой для плавности
+            // Go back to menu view with a slight delay for smoothness
             setTimeout(() => {
                 showView('menu');
             }, 500);
@@ -1201,8 +1437,8 @@
         }
 
         /**
-         * Показывает секцию выбранной категории.
-         * @param {string} category Категория, которую нужно показать.
+         * Shows the selected category section.
+         * @param {string} category The category to show.
          */
         function showCategory(category) {
             document.querySelectorAll('.category-section').forEach(section => {
@@ -1214,8 +1450,8 @@
         }
 
         /**
-         * Обновляет стили кнопок категорий.
-         * @param {string} activeCategory Активная категория.
+         * Updates the styles of category buttons.
+         * @param {string} activeCategory The active category.
          */
         function updateCategoryButtons(activeCategory) {
             document.querySelectorAll('.category-btn').forEach(btn => {
