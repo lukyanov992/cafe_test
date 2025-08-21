@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Food Cafe</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111111;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        /* Скрывает скроллбар, но сохраняет функционал прокрутки */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        /* Улучшения для свайпов на историях */
+        #story-modal {
+            touch-action: none; /* Предотвращает стандартное поведение, такое как прокрутка */
+        }
+        #story-modal #story-image {
+            user-select: none; /* Предотвращает выделение текста/изображения */
+            -webkit-user-drag: none; /* Отключает перетаскивание на iOS */
+        }
+        .progress-bar {
+            animation: progress-fill 10s linear forwards;
+        }
+        @keyframes progress-fill {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4 md:p-8">
+
+    <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col lg:flex-row gap-4 sm:gap-6 md:gap-8">
+        <!-- Основная область контента -->
+        <main class="w-full lg:w-3/5">
+            <!-- Верхний заголовок с кнопками самовывоза и поиска -->
+            <header class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
+                <button id="pickup-button" class="flex items-center gap-1 font-medium bg-[#241E1B] py-2 px-3 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0 text-xs sm:text-sm md:text-base">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                    </svg>
+                    <span>Самовывоз</span>
+                </button>
+                <div class="w-full relative mx-1">
+                    <input id="search-input" type="text" placeholder="Поиск по меню..." class="w-full pl-8 pr-2 py-2 bg-gray-800 text-white rounded-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#AB3031] transition-all duration-300 text-xs sm:text-sm md:text-base">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <button id="filter-button" class="flex items-center justify-center font-medium bg-[#241E1B] p-2 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 18h4v-2h-4v2zm-6-8v2h16v-2H4zm6-8v2h4V2h-4z"/>
+                    </svg>
+                </button>
+            </header>
+
+            <!-- Секция историй -->
+            <section class="mb-6">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Истории</h2>
+                <div id="story-container" class="flex gap-2 sm:gap-4 overflow-x-auto hide-scrollbar pb-2">
+                    <!-- Истории будут отображены здесь с помощью JS -->
+                </div>
+            </section>
+
+            <!-- Секция категорий -->
+            <section class="mb-6" id="category-section">
+                <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+                    <button data-category="burgers" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-white transition-colors duration-300 bg-[#AB3031]">Бургеры</button>
+                    <button data-category="pizza" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-gray-700 transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Пицца</button>
+                    <button data-category="snacks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-gray-700 transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Закуски</button>
+                    <button data-category="drinks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base text-gray-700 transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Напитки</button>
+                </div>
+            </section>
+
+            <!-- Секции меню -->
+            <section class="menu-container space-y-4 sm:space-y-6 hide-scrollbar h-[70vh] lg:h-[55vh] overflow-y-auto pr-2">
+                <div id="burgers-section">
+                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Бургеры</h2>
+                    <div id="burgers-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Бургеры будут отображены здесь с помощью JS -->
+                    </div>
+                </div>
+
+                <div id="pizza-section" class="hidden">
+                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Пицца</h2>
+                    <div id="pizza-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Пицца будет отображена здесь с помощью JS -->
+                    </div>
+                </div>
+
+                <div id="snacks-section" class="hidden">
+                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Закуски</h2>
+                    <div id="snacks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Закуски будут отображены здесь с помощью JS -->
+                    </div>
+                </div>
+
+                <div id="drinks-section" class="hidden">
+                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Напитки</h2>
+                    <div id="drinks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Напитки будут отображены здесь с помощью JS -->
+                    </div>
+                </div>
+                <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
+            </section>
+        </main>
+
+        <!-- Секция корзины -->
+        <aside class="w-full lg:w-2/5 p-4 bg-[#241E1B] rounded-2xl shadow-inner flex flex-col">
+            <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Ваш заказ</h2>
+            <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
+                <p id="empty-cart-message" class="text-gray-400 italic text-sm md:text-base text-center py-8">Ваша корзина пуста.</p>
+                <!-- Элементы корзины будут отображены здесь с помощью JS -->
+            </div>
+            
+            <!-- Сводка заказа и кнопка оформления -->
+            <div class="mt-4 pt-4 border-t border-gray-600">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm md:text-lg font-semibold text-gray-300">Итого:</span>
+                    <span id="cart-total" class="text-lg md:text-2xl font-bold text-[#AB3031]">0 ₽</span>
+                </div>
+                <button id="checkout-button" class="w-full bg-[#AB3031] text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-[#972C2C] transition-transform transform active:scale-95 disabled:bg-gray-400 disabled:shadow-none disabled:cursor-not-allowed text-sm md:text-lg">
+                    Оформить заказ
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Модальное окно самовывоза -->
+    <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold">Выберите точку самовывоза</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white transition-colors text-3xl leading-none">&times;</button>
+            </div>
+            <div id="pickup-locations" class="space-y-4">
+                <button class="pickup-location-btn w-full text-left p-3 sm:p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition">
+                    <h4 class="font-semibold text-sm md:text-base">Москва, Тверская улица, 15</h4>
+                    <p class="text-gray-400 text-xs md:text-sm">Время работы: 10:00 - 22:00</p>
+                </button>
+                <button class="pickup-location-btn w-full text-left p-3 sm:p-4 bg-gray-800 rounded-xl hover:bg-gray-700 transition">
+                    <h4 class="font-semibold text-sm md:text-base">Москва, Арбат, 50</h4>
+                    <p class="text-gray-400 text-xs md:text-sm">Время работы: 09:00 - 23:00</p>
+                </button>
+            </div>
+            <div class="text-center mt-6">
+                <button class="bg-gray-700 text-white py-2 px-4 rounded-xl hover:bg-gray-600 transition text-sm md:text-base" id="cancel-pickup-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно фильтров -->
+    <div id="filter-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg sm:text-xl md:text-2xl font-bold">Фильтры</h3>
+                <button id="close-filter-modal-btn" class="text-gray-400 hover:text-white transition-colors text-3xl leading-none">&times;</button>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="min-price" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Минимальная цена (₽)</label>
+                    <input type="number" id="min-price" placeholder="0" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                </div>
+                <div>
+                    <label for="max-price" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Максимальная цена (₽)</label>
+                    <input type="number" id="max-price" placeholder="10000" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="clear-filters-btn" class="bg-gray-700 text-white py-2 px-4 rounded-xl hover:bg-gray-600 transition text-sm md:text-base">Сбросить</button>
+                <button id="apply-filters-btn" class="bg-[#AB3031] text-white py-2 px-4 rounded-xl font-bold hover:bg-[#972C2C] transition-transform transform active:scale-95 text-sm md:text-base">Применить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно просмотра историй -->
+    <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50">
+        <!-- Кнопка закрытия -->
+        <button id="close-story-modal-btn" class="absolute top-4 right-4 text-white text-3xl leading-none z-20">&times;</button>
+        <!-- Прогресс-бар -->
+        <div id="story-progress-container" class="absolute top-4 left-0 right-0 p-4 pt-10 flex gap-2 justify-center z-10">
+            <!-- Сегменты прогресс-бара будут добавлены динамически -->
+        </div>
+
+        <!-- Контент истории -->
+        <div class="relative w-full h-full max-w-sm mx-auto">
+            <img id="story-image" src="" alt="Story" class="w-full h-full object-contain rounded-xl shadow-lg">
+        </div>
+    </div>
+
+
+    <!-- Диалоговое окно для подтверждения заказа вместо alert() -->
+    <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-gray-900 text-white rounded-lg p-6 sm:p-8 m-4 max-w-sm w-full text-center shadow-2xl">
+            <h3 class="text-xl md:text-2xl font-bold mb-4 text-green-400">Заказ оформлен!</h3>
+            <p id="message-text" class="text-gray-300 mb-6 text-sm md:text-base"></p>
+            <button id="close-message-button" class="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition text-sm md:text-base">Отлично</button>
+        </div>
+    </div>
+
+    <script>
+        // Данные для элементов меню
+        const menuItems = {
+            burgers: [
+                { id: 'burger_1', name: 'Классический бургер', price: 350, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер' },
+                { id: 'burger_2', name: 'Острый бургер', price: 400, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер' },
+                { id: 'burger_3', name: 'Вегетарианский бургер', price: 380, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер' }
+            ],
+            pizza: [
+                { id: 'pizza_1', name: 'Пицца Пепперони', price: 650, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца' },
+                { id: 'pizza_2', name: 'Пицца Маргарита', price: 550, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца' },
+                { id: 'pizza_3', name: 'Пицца Четыре сыра', price: 700, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Пицца' }
+            ],
+            snacks: [
+                { id: 'snack_1', name: 'Картофель фри', price: 120, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Фри' },
+                { id: 'snack_2', name: 'Луковые кольца', price: 150, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Кольца' }
+            ],
+            drinks: [
+                { id: 'drink_1', name: 'Кола', price: 100, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Кола' },
+                { id: 'drink_2', name: 'Латте', price: 180, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Латте' }
+            ]
+        };
+
+        // Данные для историй
+        const stories = [
+            { id: 'story_1', image: 'https://placehold.co/400x600/3A243F/ffffff?text=Новое\nменю' },
+            { id: 'story_2', image: 'https://placehold.co/400x600/1D424F/ffffff?text=Скидка\n-20%' },
+            { id: 'story_3', image: 'https://placehold.co/400x600/38473D/ffffff?text=Акция\nНедели' },
+            { id: 'story_4', image: 'https://placehold.co/400x600/3B3B3B/ffffff?text=Наш\nКофе' },
+            { id: 'story_5', image: 'https://placehold.co/400x600/1C273D/ffffff?text=Бесплатная\nДоставка' },
+        ];
+
+        let cart = {}; // Объект для хранения элементов корзины: {itemId: quantity}
+        let currentPickupLocation = null;
+        let activeFilters = { minPrice: null, maxPrice: null };
+        let storyTimeout = null;
+        let currentStoryIndex = 0;
+        let touchStartX = 0;
+
+        // Элементы DOM
+        const menuLists = {
+            burgers: document.getElementById('burgers-list'),
+            pizza: document.getElementById('pizza-list'),
+            snacks: document.getElementById('snacks-list'),
+            drinks: document.getElementById('drinks-list')
+        };
+        const menuSections = document.querySelectorAll('.menu-container > div');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const categorySection = document.getElementById('category-section');
+        const cartContainer = document.getElementById('cart-items-container');
+        const cartTotalSpan = document.getElementById('cart-total');
+        const checkoutButton = document.getElementById('checkout-button');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const closeMessageButton = document.getElementById('close-message-button');
+        const pickupButton = document.getElementById('pickup-button');
+        const pickupModal = document.getElementById('pickup-modal');
+        const closePickupModalBtn = document.getElementById('close-modal-btn');
+        const cancelPickupBtn = document.getElementById('cancel-pickup-btn');
+        const searchInput = document.getElementById('search-input');
+        const noResultsMessage = document.getElementById('no-results');
+        const filterButton = document.getElementById('filter-button');
+        const filterModal = document.getElementById('filter-modal');
+        const closeFilterModalBtn = document.getElementById('close-filter-modal-btn');
+        const applyFiltersBtn = document.getElementById('apply-filters-btn');
+        const clearFiltersBtn = document.getElementById('clear-filters-btn');
+        const minPriceInput = document.getElementById('min-price');
+        const maxPriceInput = document.getElementById('max-price');
+        const storyContainer = document.getElementById('story-container');
+        const storyModal = document.getElementById('story-modal');
+        const storyImage = document.getElementById('story-image');
+        const storyProgressContainer = document.getElementById('story-progress-container');
+        const closeStoryModalBtn = document.getElementById('close-story-modal-btn');
+        
+        // Функция для отображения карточки одного элемента меню
+        function renderMenuItem(item) {
+            return `
+                <div class="bg-[#241E1B] rounded-2xl shadow-md overflow-hidden flex flex-col transform hover:scale-105 transition-transform duration-300">
+                    <img src="${item.image}" alt="${item.name}" class="w-full aspect-square object-cover">
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="font-semibold text-sm md:text-base lg:text-lg mb-1 text-white">${item.name}</h3>
+                        <p class="text-gray-400 text-xs md:text-sm">${item.price} ₽</p>
+                        <button data-id="${item.id}" class="add-to-cart-btn w-full mt-auto bg-[#AB3031] text-white py-2 px-4 rounded-xl font-bold hover:bg-[#972C2C] transition-colors text-sm md:text-base">
+                            Добавить
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Функция для отображения элементов историй
+        function renderStories() {
+            storyContainer.innerHTML = stories.map(story => `
+                <div data-id="${story.id}" class="story-item flex-shrink-0 w-20 sm:w-24 aspect-[9/16] bg-gray-600 rounded-xl border-2 border-[#AB3031] overflow-hidden cursor-pointer">
+                    <img src="${story.image}" alt="Story" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+        }
+        
+        // Отображение элементов меню для конкретной категории
+        function renderCategory(category, items) {
+            const listElement = menuLists[category];
+            const sectionElement = listElement ? listElement.parentNode : null;
+
+            if (listElement && sectionElement) {
+                if (items.length > 0) {
+                    listElement.innerHTML = items.map(renderMenuItem).join('');
+                    sectionElement.classList.remove('hidden');
+                } else {
+                    sectionElement.classList.add('hidden');
+                }
+            }
+        }
+
+        // Основная функция для фильтрации, поиска и отображения меню
+        function filterAndSearchMenu() {
+            const query = searchInput.value.toLowerCase().trim();
+            const minPrice = parseInt(minPriceInput.value, 10);
+            const maxPrice = parseInt(maxPriceInput.value, 10);
+
+            // Скрываем или показываем секцию категорий в зависимости от наличия поиска/фильтров
+            if (query || activeFilters.minPrice || activeFilters.maxPrice) {
+                categorySection.classList.add('hidden');
+            } else {
+                categorySection.classList.remove('hidden');
+            }
+
+            const allItems = Object.values(menuItems).flat();
+            let filteredItems = allItems;
+
+            if (query) {
+                filteredItems = filteredItems.filter(item =>
+                    item.name.toLowerCase().includes(query)
+                );
+            }
+
+            if (!isNaN(minPrice)) {
+                filteredItems = filteredItems.filter(item => item.price >= minPrice);
+            }
+            if (!isNaN(maxPrice)) {
+                filteredItems = filteredItems.filter(item => item.price <= maxPrice);
+            }
+
+            // Скрываем все секции меню перед отображением отфильтрованных результатов
+            Object.values(menuLists).forEach(list => {
+                if (list) {
+                    list.innerHTML = '';
+                    list.parentNode.classList.add('hidden');
+                }
+            });
+            noResultsMessage.classList.add('hidden');
+
+            if (filteredItems.length > 0) {
+                // Группируем отфильтрованные элементы по категориям
+                const groupedItems = {};
+                filteredItems.forEach(item => {
+                    for (const category in menuItems) {
+                        if (menuItems[category].find(i => i.id === item.id)) {
+                            if (!groupedItems[category]) {
+                                groupedItems[category] = [];
+                            }
+                            groupedItems[category].push(item);
+                            break;
+                        }
+                    }
+                });
+
+                // Отображаем только те категории, в которых есть отфильтрованные элементы
+                for (const category in groupedItems) {
+                    renderCategory(category, groupedItems[category]);
+                }
+            } else {
+                noResultsMessage.classList.remove('hidden');
+            }
+        }
+
+        // Функция для поиска элемента по ID
+        function findItemById(id) {
+            for (const category in menuItems) {
+                const item = menuItems[category].find(i => i.id === id);
+                if (item) return item;
+            }
+            return null;
+        }
+
+        // Функция для обновления отображения корзины
+        function updateCart() {
+            cartContainer.innerHTML = '';
+            let total = 0;
+            const itemsInCart = Object.keys(cart).filter(id => cart[id] > 0);
+
+            if (itemsInCart.length === 0) {
+                emptyCartMessage.classList.remove('hidden');
+                checkoutButton.disabled = true;
+                checkoutButton.classList.add('opacity-50');
+            } else {
+                emptyCartMessage.classList.add('hidden');
+                checkoutButton.disabled = false;
+                checkoutButton.classList.remove('opacity-50');
+                
+                itemsInCart.forEach(itemId => {
+                    const quantity = cart[itemId];
+                    const itemData = findItemById(itemId);
+                    if (!itemData) return;
+
+                    const itemTotal = itemData.price * quantity;
+                    total += itemTotal;
+
+                    const cartItemElement = document.createElement('div');
+                    cartItemElement.className = 'flex items-center justify-between p-3 bg-gray-800 rounded-xl shadow-sm';
+                    cartItemElement.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <img src="${itemData.image}" alt="${itemData.name}" class="w-12 h-12 rounded-lg object-cover">
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-sm md:text-base text-white truncate">${itemData.name}</h4>
+                                <p class="text-xs text-gray-400">${itemData.price} ₽/шт</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1 text-base font-semibold">
+                            <button data-id="${itemData.id}" class="quantity-btn decrease-btn w-6 h-6 flex items-center justify-center rounded-full bg-gray-600 text-white hover:bg-gray-700 transition-colors active:scale-95 leading-none">-</button>
+                            <span class="w-5 text-center text-xs font-medium text-white">${quantity}</span>
+                            <button data-id="${itemData.id}" class="quantity-btn increase-btn w-6 h-6 flex items-center justify-center rounded-full bg-[#E54848] text-white hover:bg-[#C93F3F] transition-colors active:scale-95 leading-none">+</button>
+                        </div>
+                    `;
+                    cartContainer.appendChild(cartItemElement);
+                });
+            }
+
+            cartTotalSpan.textContent = `${total} ₽`;
+        }
+
+        // Функционал историй
+        function openStoryModal(index) {
+            currentStoryIndex = index;
+            storyModal.classList.remove('hidden');
+            updateStoryModal();
+        }
+
+        function updateStoryModal() {
+            if (storyTimeout) {
+                clearTimeout(storyTimeout);
+            }
+
+            const story = stories[currentStoryIndex];
+            storyImage.src = story.image;
+            
+            // Динамически создаем сегменты прогресс-бара
+            storyProgressContainer.innerHTML = stories.map((_, i) => `
+                <div class="flex-grow h-1 bg-gray-600 rounded-full overflow-hidden">
+                    <div id="progress-${i}" class="h-full bg-white ${i === currentStoryIndex ? 'progress-bar' : ''}" style="width: ${i < currentStoryIndex ? '100%' : '0%'};"></div>
+                </div>
+            `).join('');
+
+            // Таймер для автоматического переключения
+            storyTimeout = setTimeout(() => {
+                showNextStory();
+            }, 10000); // 10 секунд
+        }
+
+        function showNextStory() {
+            currentStoryIndex = (currentStoryIndex + 1) % stories.length;
+            updateStoryModal();
+        }
+        
+        function showPrevStory() {
+            currentStoryIndex = (currentStoryIndex - 1 + stories.length) % stories.length;
+            updateStoryModal();
+        }
+
+        function closeStoryModal() {
+            storyModal.classList.add('hidden');
+            if (storyTimeout) {
+                clearTimeout(storyTimeout);
+                storyTimeout = null;
+            }
+        }
+
+        // --- Обработчики событий ---
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-to-cart-btn')) {
+                const itemId = e.target.dataset.id;
+                cart[itemId] = (cart[itemId] || 0) + 1;
+                updateCart();
+            }
+            if (e.target.closest('.story-item')) {
+                const storyId = e.target.closest('.story-item').dataset.id;
+                const index = stories.findIndex(s => s.id === storyId);
+                if (index !== -1) {
+                    openStoryModal(index);
+                }
+            }
+        });
+
+        cartContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('quantity-btn')) {
+                const itemId = e.target.dataset.id;
+                if (e.target.classList.contains('increase-btn')) {
+                    cart[itemId]++;
+                } else if (e.target.classList.contains('decrease-btn')) {
+                    if (cart[itemId] > 1) {
+                        cart[itemId]--;
+                    } else {
+                        delete cart[itemId];
+                    }
+                }
+                updateCart();
+            }
+        });
+
+        checkoutButton.addEventListener('click', () => {
+            if (Object.keys(cart).length === 0) return;
+
+            const orderDetails = Object.keys(cart).map(id => {
+                const item = findItemById(id);
+                return {
+                    name: item.name,
+                    quantity: cart[id],
+                    price: item.price
+                };
+            });
+            const total = orderDetails.reduce((sum, item) => sum + item.quantity * item.price, 0);
+
+            let orderSummary = orderDetails.map(item => `${item.name}: ${item.quantity} шт.`).join(', ');
+            messageText.textContent = `Ваш заказ: ${orderSummary}. Общая стоимость: ${total} ₽. Мы свяжемся с вами в ближайшее время!`;
+            
+            messageBox.classList.remove('hidden');
+        });
+
+        closeMessageButton.addEventListener('click', () => {
+            messageBox.classList.add('hidden');
+            cart = {}; // Очищаем корзину после заказа
+            updateCart();
+        });
+
+        pickupButton.addEventListener('click', () => {
+            pickupModal.classList.remove('hidden');
+        });
+
+        closePickupModalBtn.addEventListener('click', () => {
+            pickupModal.classList.add('hidden');
+        });
+        cancelPickupBtn.addEventListener('click', () => {
+            pickupModal.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.pickup-location-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentPickupLocation = btn.querySelector('h4').textContent;
+                pickupButton.querySelector('span').textContent = currentPickupLocation;
+                pickupModal.classList.add('hidden');
+            });
+        });
+
+        filterButton.addEventListener('click', () => {
+            filterModal.classList.remove('hidden');
+        });
+
+        closeFilterModalBtn.addEventListener('click', () => {
+            filterModal.classList.add('hidden');
+        });
+
+        applyFiltersBtn.addEventListener('click', () => {
+            activeFilters.minPrice = parseInt(minPriceInput.value, 10);
+            activeFilters.maxPrice = parseInt(maxPriceInput.value, 10);
+            filterAndSearchMenu();
+            filterModal.classList.add('hidden');
+        });
+
+        clearFiltersBtn.addEventListener('click', () => {
+            minPriceInput.value = '';
+            maxPriceInput.value = '';
+            activeFilters.minPrice = null;
+            activeFilters.maxPrice = null;
+            filterAndSearchMenu();
+        });
+
+        searchInput.addEventListener('input', () => {
+            filterAndSearchMenu();
+        });
+
+        document.getElementById('category-tabs').addEventListener('click', (e) => {
+            if (e.target.classList.contains('category-btn')) {
+                searchInput.value = '';
+                minPriceInput.value = '';
+                maxPriceInput.value = '';
+                activeFilters.minPrice = null;
+                activeFilters.maxPrice = null;
+                
+                const category = e.target.dataset.category;
+                showCategory(category);
+            }
+        });
+        
+        // Обработчик для закрытия модального окна истории
+        closeStoryModalBtn.addEventListener('click', closeStoryModal);
+
+        // Обработчики для свайпов
+        storyModal.addEventListener('touchstart', (e) => {
+            // Запоминаем начальную точку касания
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true }); // passive: true улучшает производительность прокрутки
+
+        storyModal.addEventListener('touchend', (e) => {
+            // Определяем конечную точку касания
+            const touchEndX = e.changedTouches[0].clientX;
+            // Рассчитываем разницу
+            const deltaX = touchEndX - touchStartX;
+            const swipeThreshold = 50; // Минимальное расстояние для свайпа
+
+            if (deltaX > swipeThreshold) {
+                // Свайп вправо
+                showPrevStory();
+            } else if (deltaX < -swipeThreshold) {
+                // Свайп влево
+                showNextStory();
+            }
+        });
+
+        function showCategory(category) {
+            menuSections.forEach(section => section.classList.add('hidden'));
+            const sectionToShow = document.getElementById(`${category}-section`);
+            if (sectionToShow) {
+                sectionToShow.classList.remove('hidden');
+            }
+
+            categoryButtons.forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('bg-[#AB3031]', 'text-white');
+                    btn.classList.remove('bg-gray-800', 'text-gray-700', 'hover:bg-gray-700');
+                } else {
+                    btn.classList.remove('bg-[#AB3031]', 'text-white');
+                    btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+                }
+            });
+        }
+        
+        renderStories();
+        filterAndSearchMenu();
+        updateCart();
+        showCategory('burgers');
+
+    </script>
+</body>
+</html>
