@@ -98,7 +98,7 @@
         <div id="main-content-wrapper" class="w-full">
             
             <div id="menu-view" class="">
-                <section class="mb-6">
+                <section id="story-section" class="mb-6">
                     <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Истории</h2>
                     <div id="story-container" class="flex gap-2 sm:gap-4 overflow-x-auto hide-scrollbar pb-2">
                         </div>
@@ -195,9 +195,11 @@
                     <div id="admin-stories" class="admin-tab-content space-y-4">
                         <h3 class="text-xl font-bold">Управление историями</h3>
                         <form id="story-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
+                            <input type="hidden" id="story-image-base64">
                             <div>
-                                <label for="story-image-url" class="block text-sm font-medium text-gray-400">URL изображения</label>
-                                <input type="text" id="story-image-url" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="https://placehold.co/900x1600/...">
+                                <label for="story-image-upload" class="block text-sm font-medium text-gray-400">Изображение</label>
+                                <input type="file" id="story-image-upload" accept="image/*" class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600">
+                                <img id="story-preview" class="hidden mt-4 w-24 h-42 object-cover rounded-lg" src="" alt="Предпросмотр">
                             </div>
                             <div>
                                 <label for="story-text-content" class="block text-sm font-medium text-gray-400">Текст истории</label>
@@ -211,10 +213,8 @@
                     <div id="admin-items" class="admin-tab-content hidden space-y-4">
                         <h3 class="text-xl font-bold">Управление товарами</h3>
                         <form id="item-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
-                            <div>
-                                <label for="item-id" class="block text-sm font-medium text-gray-400">ID товара (генерируется)</label>
-                                <input type="text" id="item-id" class="mt-1 block w-full bg-gray-700 text-gray-500 rounded-md p-2 cursor-not-allowed" disabled>
-                            </div>
+                            <input type="hidden" id="item-id-hidden">
+                            <input type="hidden" id="item-image-base64">
                             <div>
                                 <label for="item-name" class="block text-sm font-medium text-gray-400">Название</label>
                                 <input type="text" id="item-name" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="Название товара" required>
@@ -224,8 +224,9 @@
                                 <input type="number" id="item-price" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="100" required>
                             </div>
                             <div>
-                                <label for="item-image" class="block text-sm font-medium text-gray-400">URL изображения</label>
-                                <input type="text" id="item-image" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="https://placehold.co/...">
+                                <label for="item-image-upload" class="block text-sm font-medium text-gray-400">Изображение</label>
+                                <input type="file" id="item-image-upload" accept="image/*" class="mt-1 block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-white hover:file:bg-gray-600">
+                                <img id="item-preview" class="hidden mt-4 w-24 h-24 object-cover rounded-full" src="" alt="Предпросмотр">
                             </div>
                             <div>
                                 <label for="item-category" class="block text-sm font-medium text-gray-400">Категория</label>
@@ -260,13 +261,12 @@
                     </div>
                     
                     <div id="admin-users" class="admin-tab-content hidden space-y-4">
-                        <h3 class="text-xl font-bold">Управление пользователями</h3>
-                        <div id="admin-users-list" class="space-y-4">
-                            <div class="bg-gray-800 p-4 rounded-xl">
-                                <p class="text-gray-400 italic text-sm md:text-base text-center">Данные пользователя сохраняются локально.</p>
-                                <button id="clear-user-data-btn" class="w-full mt-4 bg-red-600 text-white py-2 rounded-full font-bold transition-colors hover:bg-red-700">Очистить данные пользователя</button>
-                            </div>
+                        <h3 class="text-xl font-bold">Пользователи</h3>
+                        <div class="mb-4">
+                            <input type="text" id="user-search-input" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031]" placeholder="Поиск по номеру телефона...">
                         </div>
+                        <div id="users-list-container" class="space-y-3">
+                            </div>
                     </div>
 
                 </div>
@@ -483,6 +483,7 @@
         let cart = new Map();
         
         // DOM elements
+        const storySection = document.getElementById('story-section');
         const mainHeader = document.getElementById('main-header');
         const pickupButton = document.getElementById('pickup-button');
         const categoryTabs = document.getElementById('category-tabs');
@@ -551,21 +552,26 @@
         const adminTabContents = document.querySelectorAll('.admin-tab-content');
         const storiesList = document.getElementById('stories-list');
         const storyForm = document.getElementById('story-form');
-        const storyImageUrlInput = document.getElementById('story-image-url');
+        const storyImageUpload = document.getElementById('story-image-upload');
+        const storyImageBase64 = document.getElementById('story-image-base64');
+        const storyPreview = document.getElementById('story-preview');
         const storyTextContentInput = document.getElementById('story-text-content');
         const itemsList = document.getElementById('items-list');
         const itemForm = document.getElementById('item-form');
-        const itemIdInput = document.getElementById('item-id');
+        const itemIdHidden = document.getElementById('item-id-hidden');
         const itemNameInput = document.getElementById('item-name');
         const itemPriceInput = document.getElementById('item-price');
-        const itemImageInput = document.getElementById('item-image');
+        const itemImageUpload = document.getElementById('item-image-upload');
+        const itemImageBase64 = document.getElementById('item-image-base64');
+        const itemPreview = document.getElementById('item-preview');
         const itemCategorySelect = document.getElementById('item-category');
         const categoriesList = document.getElementById('categories-list');
         const categoryForm = document.getElementById('category-form');
         const categoryIdInput = document.getElementById('category-id');
         const categoryNameInput = document.getElementById('category-name');
         const adminOrdersList = document.getElementById('admin-orders-list');
-        const clearUserDataBtn = document.getElementById('clear-user-data-btn');
+        const usersListContainer = document.getElementById('users-list-container');
+        const userSearchInput = document.getElementById('user-search-input');
 
         let currentStoryIndex = 0;
         let storyProgressInterval;
@@ -585,6 +591,9 @@
         // Initialize on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
             loadAllData();
+            if (storyData.length === 0) {
+                storySection.classList.add('hidden');
+            }
             renderStories();
             renderAllMenuItems();
             renderCategoryTabs();
@@ -774,7 +783,41 @@
             storyForm.addEventListener('submit', handleStoryFormSubmit);
             itemForm.addEventListener('submit', handleItemFormSubmit);
             categoryForm.addEventListener('submit', handleCategoryFormSubmit);
-            clearUserDataBtn.addEventListener('click', clearUserData);
+            
+            // Image Upload Handlers
+            itemImageUpload.addEventListener('change', (e) => handleImageUpload(e, itemImageBase64, itemPreview));
+            storyImageUpload.addEventListener('change', (e) => handleImageUpload(e, storyImageBase64, storyPreview));
+            userSearchInput.addEventListener('input', (e) => renderAdminUsersPage(e.target.value));
+        }
+
+        /**
+         * Reads an image file and converts it to a Base64 Data URL.
+         * @param {File} file The image file.
+         * @returns {Promise<string>} A promise that resolves with the Data URL.
+         */
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        /**
+         * Handles file input change for images, updating the preview and hidden input.
+         * @param {Event} event The input change event.
+         * @param {HTMLInputElement} base64Input The hidden input to store the Base64 string.
+         * @param {HTMLImageElement} previewElement The img element for preview.
+         */
+        async function handleImageUpload(event, base64Input, previewElement) {
+            const file = event.target.files[0];
+            if (file) {
+                const dataUrl = await readFileAsDataURL(file);
+                base64Input.value = dataUrl;
+                previewElement.src = dataUrl;
+                previewElement.classList.remove('hidden');
+            }
         }
         
         /**
@@ -809,7 +852,7 @@
             } else if (tab === 'orders') {
                 renderAdminOrders();
             } else if (tab === 'users') {
-                renderAdminUsers();
+                renderAdminUsersPage();
             }
         }
 
@@ -844,7 +887,7 @@
             storiesList.innerHTML = storyData.map((story, index) => `
                 <li class="bg-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
                     <div class="flex items-center gap-4 flex-grow">
-                        <img src="${story.image}" alt="Story" class="w-16 h-16 rounded-full object-cover">
+                        <img src="${story.image}" alt="Story" class="w-16 h-28 object-cover rounded-md">
                         <span class="text-sm font-medium truncate">${story.text}</span>
                     </div>
                     <div class="flex gap-2 flex-shrink-0">
@@ -865,6 +908,7 @@
                     saveAllData();
                     renderAdminStories();
                     renderStories();
+                    if (storyData.length === 0) storySection.classList.add('hidden');
                 });
             });
 
@@ -872,8 +916,10 @@
                 btn.addEventListener('click', (e) => {
                     const index = parseInt(e.currentTarget.dataset.index);
                     const story = storyData[index];
-                    storyImageUrlInput.value = story.image;
                     storyTextContentInput.value = story.text;
+                    storyImageBase64.value = story.image; // Store current image
+                    storyPreview.src = story.image;
+                    storyPreview.classList.remove('hidden');
                     storyForm.dataset.editIndex = index;
                 });
             });
@@ -885,23 +931,27 @@
          */
         function handleStoryFormSubmit(e) {
             e.preventDefault();
-            const imageUrl = storyImageUrlInput.value.trim();
+            const imageUrl = storyImageBase64.value; // Always use the base64 value
             const textContent = storyTextContentInput.value.trim();
             const editIndex = storyForm.dataset.editIndex;
 
-            if (imageUrl && textContent) {
-                if (editIndex !== undefined) {
-                    // Edit existing story
-                    storyData[editIndex] = { image: imageUrl, text: textContent };
-                    delete storyForm.dataset.editIndex;
+            if ((imageUrl || storyImageUpload.files[0]) && textContent) {
+                 const newStory = { image: imageUrl, text: textContent };
+                if (editIndex !== undefined && editIndex !== null) {
+                    storyData[editIndex] = newStory;
                 } else {
-                    // Add new story
-                    storyData.push({ image: imageUrl, text: textContent });
+                    storyData.push(newStory);
                 }
                 saveAllData();
                 renderAdminStories();
                 renderStories();
+                if (storyData.length > 0) storySection.classList.remove('hidden');
+                
+                // Reset form
                 storyForm.reset();
+                delete storyForm.dataset.editIndex;
+                storyPreview.classList.add('hidden');
+                storyImageBase64.value = '';
             }
         }
 
@@ -911,7 +961,8 @@
         function renderAdminItems() {
              itemsList.innerHTML = '';
              Object.keys(menuItems).forEach(category => {
-                 itemsList.innerHTML += `<h4 class="font-bold text-lg mt-4">${menuItems[category].find(i=>i.category === category)?.category || category}</h4>`;
+                 const categoryName = menuItems[category][0]?.category ? menuItems[category].find(c => c.category)?.category : category;
+                 itemsList.innerHTML += `<h4 class="font-bold text-lg mt-4">${categoryName}</h4>`;
                  menuItems[category].forEach(item => {
                       itemsList.innerHTML += `
                           <div class="bg-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
@@ -946,10 +997,12 @@
                     const itemId = e.currentTarget.dataset.id;
                     const item = allMenuItems.find(i => i.id === itemId);
                     if (item) {
-                        itemIdInput.value = item.id;
+                        itemForm.dataset.editingId = item.id;
                         itemNameInput.value = item.name;
                         itemPriceInput.value = item.price;
-                        itemImageInput.value = item.image;
+                        itemImageBase64.value = item.image; // Store current image
+                        itemPreview.src = item.image;
+                        itemPreview.classList.remove('hidden');
                         itemCategorySelect.value = item.category;
                     }
                 });
@@ -986,19 +1039,23 @@
          */
         function handleItemFormSubmit(e) {
             e.preventDefault();
-            const itemId = itemIdInput.value || generateId('item');
+            const editingId = itemForm.dataset.editingId;
+            const itemId = editingId || generateId('item');
+            
             const item = {
                 id: itemId,
                 name: itemNameInput.value.trim(),
                 price: parseInt(itemPriceInput.value, 10),
-                image: itemImageInput.value.trim() || `https://placehold.co/400x400/241E1B/ffffff?text=${itemNameInput.value.trim()}`,
+                image: itemImageBase64.value || `https://placehold.co/400x400/241E1B/ffffff?text=${itemNameInput.value.trim()}`,
                 category: itemCategorySelect.value
             };
 
             // Remove existing item if editing
-            Object.keys(menuItems).forEach(key => {
-                 menuItems[key] = menuItems[key].filter(i => i.id !== itemId);
-            });
+            if (editingId) {
+                Object.keys(menuItems).forEach(key => {
+                     menuItems[key] = menuItems[key].filter(i => i.id !== editingId);
+                });
+            }
             
             // Add or update the item
             if (!menuItems[item.category]) {
@@ -1009,8 +1066,12 @@
             saveAllData();
             renderAllMenuItems();
             renderAdminItems();
+            
+            // Reset form
             itemForm.reset();
-            itemIdInput.value = '';
+            delete itemForm.dataset.editingId;
+            itemPreview.classList.add('hidden');
+            itemImageBase64.value = '';
         }
 
         /**
@@ -1063,6 +1124,17 @@
         }
 
         /**
+         * Gets a user-friendly name for the payment method.
+         * @param {string} methodKey The key for the payment method ('card' or 'cash').
+         * @returns {string} The display name.
+         */
+        function getPaymentMethodName(methodKey) {
+            if (methodKey === 'card') return 'Картой / СБП';
+            if (methodKey === 'cash') return 'Наличные';
+            return methodKey;
+        }
+
+        /**
          * Renders all order history in the admin panel.
          */
         function renderAdminOrders() {
@@ -1089,7 +1161,7 @@
                             <span>${order.total} ₽</span>
                         </div>
                         <div class="text-xs text-gray-400 mb-2">
-                            <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${order.paymentMethod}</span><br>
+                            <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${getPaymentMethodName(order.paymentMethod)}</span><br>
                             <span>Место: ${order.location}</span> | <span>Дата: ${order.date}</span> | <span>Время: ${order.time}</span>
                         </div>
                         <ul class="space-y-1">
@@ -1102,24 +1174,28 @@
         }
         
         /**
-         * Renders user data in the admin panel.
+         * Renders the user management page in the admin panel.
+         * @param {string} [searchTerm] - Optional search term to filter users by phone.
          */
-        function renderAdminUsers() {
-            // User data is handled by `clearUserData` for simplicity, as it's a single object
+        function renderAdminUsersPage(searchTerm = '') {
+            const allUsers = loadAllUsers();
+            const filteredUsers = allUsers.filter(user => user.phone.includes(searchTerm));
+
+            if (filteredUsers.length === 0) {
+                usersListContainer.innerHTML = '<p class="text-gray-400 italic text-center">Пользователи не найдены.</p>';
+                return;
+            }
+
+            usersListContainer.innerHTML = filteredUsers.map(user => `
+                <div class="bg-gray-800 p-4 rounded-xl flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-white">${user.name}</p>
+                        <p class="text-sm text-gray-400">${user.phone}</p>
+                    </div>
+                </div>
+            `).join('');
         }
         
-        /**
-         * Clears all user data from localStorage.
-         */
-        function clearUserData() {
-            localStorage.removeItem('userData');
-            localStorage.removeItem('orderHistory');
-            profileNameInput.value = '';
-            profilePhoneInput.value = '+7';
-            renderOrderHistory(); // Rerender profile order history
-            renderAdminOrders(); // Rerender admin orders
-        }
-
         /**
          * Updates the style of buttons in the order form.
          * @param {HTMLElement} activeBtn The clicked button.
@@ -1192,7 +1268,7 @@
         }
         
         /**
-         * Loads user data from localStorage.
+         * Loads the current user data from localStorage.
          * @returns {object|null} User data object or null.
          */
         function loadUserData() {
@@ -1201,12 +1277,35 @@
         }
 
         /**
+         * Loads all users from localStorage.
+         * @returns {Array} Array of all users.
+         */
+        function loadAllUsers() {
+            const users = localStorage.getItem('allUsers');
+            return users ? JSON.parse(users) : [];
+        }
+
+        /**
          * Saves user data to localStorage.
          * @param {string} name User's name.
          * @param {string} phone User's phone number.
          */
         function saveUserData(name, phone) {
+            // Save the current user for profile page quick access
             localStorage.setItem('userData', JSON.stringify({ name, phone }));
+
+            // Update the master list of all users
+            const allUsers = loadAllUsers();
+            const userIndex = allUsers.findIndex(user => user.phone === phone);
+
+            if (userIndex > -1) {
+                // Update existing user's name if it has changed
+                allUsers[userIndex].name = name;
+            } else {
+                // Add new user to the list
+                allUsers.push({ name, phone });
+            }
+            localStorage.setItem('allUsers', JSON.stringify(allUsers));
         }
         
         /**
@@ -1275,7 +1374,7 @@
                             <span>${order.total} ₽</span>
                         </div>
                         <div class="text-xs text-gray-400 mb-2">
-                            <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${order.paymentMethod}</span><br>
+                            <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${getPaymentMethodName(order.paymentMethod)}</span><br>
                             <span>Место: ${order.location}</span> | <span>Дата: ${order.date}</span> | <span>Время: ${order.time}</span>
                         </div>
                         <ul class="space-y-1 text-sm md:text-base">
@@ -1638,11 +1737,11 @@
                     const itemTotal = item.price * item.quantity;
                     const cartItemHtml = `
                         <div id="cart-item-${item.id}" class="flex items-center justify-between p-2 bg-[#191919] rounded-xl shadow-md text-sm md:text-base">
-                            <div class="flex items-center gap-2 flex-grow">
+                            <div class="flex items-center gap-2 flex-grow min-w-0">
                                 <img src="${item.image}" alt="${item.name}" class="w-10 h-10 rounded-full object-cover flex-shrink-0">
-                                <span class="font-medium flex-grow">${item.name}</span>
+                                <span class="font-medium flex-grow truncate">${item.name}</span>
                             </div>
-                            <div class="flex items-center gap-2 flex-shrink-0">
+                            <div class="flex items-center gap-2 flex-shrink-0 ml-2">
                                 <button class="quantity-btn w-6 h-6 rounded-full flex items-center justify-center bg-[#AB3031] text-white hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="decrease">-</button>
                                 <span class="w-6 text-center">${item.quantity}</span>
                                 <button class="quantity-btn w-6 h-6 rounded-full flex items-center justify-center bg-[#AB3031] text-white hover:bg-[#972C2C] transition-colors" data-id="${item.id}" data-action="increase">+</button>
