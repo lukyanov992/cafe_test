@@ -14,7 +14,7 @@
             color: #ffffff;
             min-height: 100vh;
         }
-        /* Скрывает скроллбар, но сохраняет функционал прокрутки */
+        /* Hides scrollbar but keeps scrolling functionality */
         .hide-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -23,7 +23,7 @@
             scrollbar-width: none;  /* Firefox */
         }
         
-        /* Анимация для модальных окон */
+        /* Modal window animation */
         .modal-enter {
             animation: fadeIn 0.3s ease-out;
         }
@@ -39,7 +39,7 @@
             to { opacity: 0; }
         }
         
-        /* Анимация для подтверждения */
+        /* Checkmark animation */
         .checkmark-anim {
             stroke-dasharray: 1000;
             stroke-dashoffset: 1000;
@@ -49,7 +49,7 @@
             100% { stroke-dashoffset: 0; }
         }
         
-        /* Стили для прогресс-бара заказа */
+        /* Styles for the order progress bar */
         .order-status-bar {
             display: flex;
             align-items: center;
@@ -85,7 +85,7 @@
             text-align: center;
             white-space: nowrap;
             color: #a0aec0; /* text-gray-400 */
-            width: 80px; /* Фиксированная ширина для центрирования */
+            width: 80px; /* Fixed width for centering */
             left: 50%;
             transform: translateX(-50%);
         }
@@ -94,7 +94,7 @@
             color: #10b981; /* text-green-500 */
         }
         
-        /* Анимация заполнения прогресс-бара */
+        /* Progress bar fill animation */
         .progress-fill-animation {
             animation: progress-fill 3s ease-out forwards;
         }
@@ -104,7 +104,7 @@
             to { width: 100%; }
         }
         
-        /* Стили для нижней панели корзины */
+        /* Styles for the bottom cart panel */
         #bottom-cart-menu {
             position: fixed;
             bottom: 1rem;
@@ -136,8 +136,8 @@
 
     <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6 md:gap-8 min-h-[calc(100vh-8rem)]">
         
-        <!-- Верхний заголовок с кнопками самовывоза и профиля -->
-        <header class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
+        <!-- Top header with pickup and profile buttons -->
+        <header id="main-header" class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
             <button id="pickup-button" class="flex items-center gap-1 font-medium bg-[#241E1B] py-2 px-3 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0 text-xs sm:text-sm md:text-base">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
@@ -149,20 +149,20 @@
             </button>
         </header>
 
-        <!-- Основная область контента -->
+        <!-- Main content area -->
         <div id="main-content-wrapper" class="w-full">
             
-            <!-- Контейнер для меню -->
+            <!-- Menu container -->
             <div id="menu-view" class="">
-                <!-- Секция историй -->
+                <!-- Stories section -->
                 <section class="mb-6">
                     <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Истории</h2>
                     <div id="story-container" class="flex gap-2 sm:gap-4 overflow-x-auto hide-scrollbar pb-2">
-                        <!-- Истории будут отображены здесь с помощью JS -->
+                        <!-- Stories will be rendered here by JS -->
                     </div>
                 </section>
 
-                <!-- Секция категорий -->
+                <!-- Categories section -->
                 <section class="mb-6" id="category-section">
                     <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
                         <button data-category="burgers" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-[#AB3031] text-white">Бургеры</button>
@@ -172,59 +172,61 @@
                     </div>
                 </section>
 
-                <!-- Секции меню -->
+                <!-- Menu sections -->
                 <section class="menu-container space-y-4 sm:space-y-6 hide-scrollbar h-[70vh] lg:h-[55vh] overflow-y-auto pr-2">
                     <div id="burgers-section" class="category-section">
                         <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Бургеры</h2>
                         <div id="burgers-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Бургеры будут отображены здесь с помощью JS -->
+                            <!-- Burgers will be rendered here by JS -->
                         </div>
                     </div>
 
                     <div id="pizza-section" class="category-section hidden">
                         <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Пицца</h2>
                         <div id="pizza-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Пицца будет отображена здесь с помощью JS -->
+                            <!-- Pizza will be rendered here by JS -->
                         </div>
                     </div>
 
                     <div id="snacks-section" class="category-section hidden">
                         <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Закуски</h2>
                         <div id="snacks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Закуски будут отображены здесь с помощью JS -->
+                            <!-- Snacks will be rendered here by JS -->
                         </div>
                     </div>
 
                     <div id="drinks-section" class="category-section hidden">
                         <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Напитки</h2>
                         <div id="drinks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Напитки будут отображены здесь с помощью JS -->
+                            <!-- Drinks will be rendered here by JS -->
                         </div>
                     </div>
                     <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
                 </section>
             </div>
 
-            <!-- Контейнер для корзины (по умолчанию скрыт) -->
+            <!-- Cart container (hidden by default) -->
             <div id="cart-view" class="hidden h-full flex flex-col">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Корзина</h2>
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-4">
                     <h3 class="text-lg font-bold">Место самовывоза</h3>
-                    <p id="cart-pickup-location" class="text-sm text-gray-400 mt-1">Москва, Тверская улица, 15</p>
+                    <button id="cart-pickup-location-btn" class="text-sm text-gray-400 mt-1 cursor-pointer hover:underline">
+                        <span id="cart-pickup-location">Москва, Тверская улица, 15</span>
+                    </button>
                 </div>
                 <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
-                    <!-- Элементы корзины будут отображены здесь с помощью JS -->
+                    <!-- Cart items will be rendered here by JS -->
                 </div>
                 
-                <!-- Секция "Добавить к заказу" -->
+                <!-- "Add to order" section -->
                 <section id="suggested-items-section" class="mt-6 hidden">
                     <h3 class="text-lg font-bold mb-4">Добавить к заказу</h3>
                     <div id="suggested-items-list" class="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-                        <!-- Здесь будут предложенные товары -->
+                        <!-- Suggested items will be here -->
                     </div>
                 </section>
                 
-                <!-- Кнопка "Оформить заказ" в корзине -->
+                <!-- "Place Order" button in cart -->
                 <div id="place-order-wrapper" class="mt-4">
                     <button id="place-order-btn" class="w-full bg-[#AB3031] text-white py-3 px-6 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C] disabled:bg-gray-700 disabled:cursor-not-allowed">
                         Оформить заказ
@@ -232,10 +234,10 @@
                 </div>
             </div>
 
-            <!-- Контейнер для профиля (по умолчанию скрыт) -->
+            <!-- Profile container (hidden by default) -->
             <div id="profile-view" class="hidden h-full">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Профиль</h2>
-                <!-- Блок с данными пользователя -->
+                <!-- User data block -->
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-lg font-bold">Мои данные</h3>
@@ -251,18 +253,18 @@
                         </div>
                         <div>
                             <label for="profile-phone" class="block text-xs sm:text-sm font-medium text-gray-400 mb-1">Номер телефона</label>
-                            <input type="tel" id="profile-phone" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base disabled:opacity-75" placeholder="+7 (XXX) XXX-XX-XX" readonly>
-                            <p id="phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Используйте +7 (XXX) XXX-XX-XX.</p>
+                            <input type="tel" id="profile-phone" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base disabled:opacity-75" placeholder="+7" value="+7" readonly>
+                            <p id="phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Требуется 10 цифр после +7.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Блок с историей заказов -->
+                <!-- Order history block -->
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner h-fit overflow-y-auto">
                     <h3 class="text-lg font-bold mb-4">История заказов</h3>
                     <div id="order-history-container" class="space-y-4">
                         <p class="text-gray-400 italic text-sm md:text-base text-center">У вас пока нет заказов.</p>
-                        <!-- Здесь будет отображаться история заказов -->
+                        <!-- Order history will be rendered here -->
                     </div>
                 </div>
             </div>
@@ -270,19 +272,19 @@
         </div>
     </div>
     
-    <!-- Нижняя панель корзины (по умолчанию скрыта) -->
+    <!-- Bottom cart panel (hidden by default) -->
     <button id="bottom-cart-menu" class="bg-[#AB3031] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0-12L6.1 3H4v2h2.1l3.5 7-1.3 2H17v-2H8.8l.9-2zm8.1 0-1.6-4H20v2h-2.1z"/></svg>
         <span id="bottom-cart-total-sum" class="font-bold text-lg">0 ₽</span>
     </button>
     
-    <!-- Кнопка "На главную" (по умолчанию скрыта) -->
-    <button id="back-to-main-btn" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 hidden">
+    <!-- "Back to Main" button (hidden by default) -->
+    <button id="back-to-main-btn" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 hidden">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         <span>На главную</span>
     </button>
 
-    <!-- Модальное окно самовывоза -->
+    <!-- Pickup modal window -->
     <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -302,7 +304,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно для оформления заказа (новая функциональность) -->
+    <!-- Order form modal window (new functionality) -->
     <div id="order-form-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -311,7 +313,7 @@
             </div>
             <form id="order-form" class="space-y-4">
                 
-                <!-- Способ получения -->
+                <!-- Delivery method -->
                 <div>
                     <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Способ получения</label>
                     <div class="flex gap-2">
@@ -324,7 +326,7 @@
                     </div>
                 </div>
 
-                <!-- Время выдачи -->
+                <!-- Pickup time -->
                 <div>
                     <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Время выдачи</label>
                     <div class="flex flex-wrap gap-2">
@@ -348,7 +350,7 @@
                      <input type="time" id="custom-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
                 </div>
 
-                <!-- Способ оплаты -->
+                <!-- Payment method -->
                 <div>
                     <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Способ оплаты</label>
                     <div class="flex gap-2">
@@ -367,8 +369,8 @@
                 </div>
                 <div>
                     <label for="phone" class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Номер телефона</label>
-                    <input type="tel" id="phone" placeholder="+7 (XXX) XXX-XX-XX" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
-                    <p id="order-phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Используйте +7 (XXX) XXX-XX-XX.</p>
+                    <input type="tel" id="phone" placeholder="+7" value="+7" required class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
+                    <p id="order-phone-validation-message" class="text-red-400 text-xs mt-1 hidden">Неверный формат номера телефона. Требуется 10 цифр после +7.</p>
                 </div>
                 
                 <button type="submit" id="pay-button" class="w-full bg-[#AB3031] text-white py-3 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C]">
@@ -378,7 +380,7 @@
         </div>
     </div>
     
-    <!-- Модальное окно для подтверждения заказа (вместо alert()) -->
+    <!-- Order confirmation modal window (instead of alert()) -->
     <div id="confirmation-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#111111] text-white rounded-2xl p-6 sm:p-8 m-4 max-w-sm w-full text-center shadow-2xl flex flex-col items-center">
             <div class="w-20 h-20 mb-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -392,22 +394,22 @@
         </div>
     </div>
     
-    <!-- Модальное окно просмотра историй -->
+    <!-- Story view modal window -->
     <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50 modal-enter">
-        <!-- Кнопка закрытия -->
+        <!-- Close button -->
         <button id="close-story-modal-btn" class="absolute top-4 right-4 text-white text-3xl leading-none z-20">&times;</button>
-        <!-- Прогресс-бар -->
+        <!-- Progress bar -->
         <div id="story-progress-container" class="absolute top-4 left-0 right-0 p-4 pt-10 flex gap-2 justify-center z-10">
-            <!-- Сегменты прогресс-бара будут добавлены динамически -->
+            <!-- Progress bar segments will be added dynamically -->
         </div>
-        <!-- Контент истории -->
+        <!-- Story content -->
         <div class="relative w-full max-w-xs md:max-w-sm lg:max-w-md aspect-[9/16]">
             <img id="story-image" src="" alt="Story" class="w-full h-full object-contain rounded-xl shadow-lg">
             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-4">
                 <p id="story-text" class="text-white text-sm md:text-base font-semibold text-center"></p>
             </div>
         </div>
-        <!-- Кнопки навигации -->
+        <!-- Navigation buttons -->
         <button id="prev-story-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&lt;</button>
         <button id="next-story-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&gt;</button>
     </div>
@@ -458,10 +460,8 @@
         // Cart data storage (Map for efficiency)
         let cart = new Map();
         
-        // Store phone number input state to handle backspace
-        let lastPhoneLength = 0;
-
         // DOM elements
+        const mainHeader = document.getElementById('main-header');
         const pickupButton = document.getElementById('pickup-button');
         const categoryTabs = document.getElementById('category-tabs');
         const storyContainer = document.getElementById('story-container');
@@ -474,7 +474,8 @@
         const topProfileBtn = document.getElementById('top-right-profile-btn');
         const bottomCartMenu = document.getElementById('bottom-cart-menu');
         const bottomCartTotalSum = document.getElementById('bottom-cart-total-sum');
-        const cartPickupLocation = document.getElementById('cart-pickup-location');
+        const cartPickupLocationText = document.getElementById('cart-pickup-location');
+        const cartPickupLocationBtn = document.getElementById('cart-pickup-location-btn');
         const suggestedItemsList = document.getElementById('suggested-items-list');
         const suggestedItemsSection = document.getElementById('suggested-items-section');
         const backToMainBtn = document.getElementById('back-to-main-btn');
@@ -521,8 +522,8 @@
         const pickupAddresses = document.querySelectorAll('.pickup-location-btn');
         let currentPickupLocation = "Москва, Тверская улица, 15";
         
-        // Regex for Russian phone number validation (+7 (XXX) XXX-XX-XX)
-        const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+        // Regex for Russian phone number validation (+7 and 10 digits)
+        const phoneRegex = /^\+7\d{10}$/;
         
         // Animation variables
         const STATUS_TRANSITION_DURATION = 3000; // 3 seconds per stage
@@ -547,52 +548,30 @@
         });
         
         /**
-         * Formats a raw number into a Russian phone number format.
-         * @param {string} rawNumber Raw digits.
-         * @returns {string} Formatted number.
-         */
-        function formatPhoneNumber(rawNumber) {
-            const digits = rawNumber.replace(/\D/g, '');
-            if (digits.length === 0) return '';
-            
-            let formatted = '+7';
-            if (digits.length > 0) {
-                formatted += ' (' + digits.substring(0, 3);
-            }
-            if (digits.length >= 4) {
-                formatted += ') ' + digits.substring(3, 6);
-            }
-            if (digits.length >= 7) {
-                formatted += '-' + digits.substring(6, 8);
-            }
-            if (digits.length >= 9) {
-                formatted += '-' + digits.substring(8, 10);
-            }
-            return formatted;
-        }
-        
-        /**
-         * Input event handler for phone number formatting.
+         * Handles phone number input, ensuring it starts with +7 and contains only 10 digits.
          * @param {Event} e The input event.
          */
         function handlePhoneInput(e) {
             const input = e.target;
-            const rawValue = input.value.replace(/\D/g, '');
-            let start = input.selectionStart;
-            const newLength = rawValue.length;
+            const start = input.selectionStart;
+            let value = input.value;
 
-            if (newLength < lastPhoneLength) {
-                lastPhoneLength = newLength;
-                return; // Let backspace and delete work as intended
+            // Ensure the value starts with +7 and cursor is not at the beginning
+            if (!value.startsWith('+7') || start < 2) {
+                 value = '+7' + value.substring(1);
             }
-            lastPhoneLength = newLength;
 
-            let oldLength = input.value.length;
-            input.value = formatPhoneNumber(rawValue);
+            // Remove all non-digit characters after +7
+            const rawDigits = value.substring(2).replace(/\D/g, '');
+            let newValue = '+7' + rawDigits.substring(0, 10);
+            
+            input.value = newValue;
 
-            let diff = input.value.length - oldLength;
-            if (start !== null) {
-                input.setSelectionRange(start + diff, start + diff);
+            // Maintain cursor position
+            if (start < 2) {
+                input.setSelectionRange(newValue.length, newValue.length);
+            } else {
+                input.setSelectionRange(start, start);
             }
         }
 
@@ -602,6 +581,13 @@
                 pickupModal.classList.remove('hidden');
                 pickupModal.classList.add('modal-enter');
             });
+            
+            // Listen for clicks on the pickup location in the cart view
+            cartPickupLocationBtn.addEventListener('click', () => {
+                 pickupModal.classList.remove('hidden');
+                 pickupModal.classList.add('modal-enter');
+            });
+            
             closePickupModalBtn.addEventListener('click', () => {
                 pickupModal.classList.add('modal-leave');
                 setTimeout(() => {
@@ -624,7 +610,7 @@
                     
                     currentPickupLocation = targetButton.dataset.locationName;
                     pickupButton.querySelector('span').textContent = currentPickupLocation;
-                    cartPickupLocation.textContent = currentPickupLocation;
+                    cartPickupLocationText.textContent = currentPickupLocation;
                     pickupModal.classList.add('modal-leave');
                     setTimeout(() => {
                         pickupModal.classList.add('hidden');
@@ -757,7 +743,7 @@
             if (pickupAddresses.length > 0) {
                 currentPickupLocation = pickupAddresses[0].dataset.locationName;
                 pickupButton.querySelector('span').textContent = currentPickupLocation;
-                cartPickupLocation.textContent = currentPickupLocation;
+                cartPickupLocationText.textContent = currentPickupLocation;
             }
         }
         
@@ -811,10 +797,10 @@
             const userData = loadUserData();
             if (userData) {
                 profileNameInput.value = userData.name || '';
-                profilePhoneInput.value = userData.phone || '';
+                profilePhoneInput.value = userData.phone || '+7';
             } else {
                 profileNameInput.value = '';
-                profilePhoneInput.value = '';
+                profilePhoneInput.value = '+7';
             }
             renderOrderHistory();
         }
@@ -953,10 +939,17 @@
             profileView.classList.add('hidden');
             bottomCartMenu.classList.remove('visible');
             backToMainBtn.classList.add('hidden');
+            
+            // Hide header buttons in cart and profile views
+            pickupButton.classList.add('hidden');
+            topProfileBtn.classList.add('hidden');
 
             if (viewName === 'menu') {
                 menuView.classList.remove('hidden');
                 updateBottomCartMenu();
+                // Show header buttons in menu view
+                pickupButton.classList.remove('hidden');
+                topProfileBtn.classList.remove('hidden');
             } else if (viewName === 'cart') {
                 cartView.classList.remove('hidden');
                 backToMainBtn.classList.remove('hidden');
@@ -1158,7 +1151,10 @@
             if (item) {
                 cart.set(itemId, { ...item, quantity: 1 });
                 updateMenuItemControl(item);
-                updateBottomCartMenu();
+                // Only update the bottom cart menu if we are on the menu page
+                if (!menuView.classList.contains('hidden')) {
+                    updateBottomCartMenu();
+                }
             }
         }
 
@@ -1183,7 +1179,10 @@
                 if (originalItem) {
                     updateMenuItemControl(originalItem);
                 }
-                updateBottomCartMenu();
+                // Only update the bottom cart menu if on the menu view
+                if (!menuView.classList.contains('hidden')) {
+                     updateBottomCartMenu();
+                }
                 // If we are on the cart page, re-render it
                 if (cartView.classList.contains('hidden') === false) {
                     renderCart();
@@ -1293,7 +1292,7 @@
                 document.querySelectorAll('#suggested-items-list .add-to-cart-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         addToCart(e);
-                        // After adding from suggestions, update the cart itself
+                        // After adding from suggestions, re-render the cart itself
                         renderCart(); 
                     });
                 });
@@ -1353,7 +1352,7 @@
             const userData = loadUserData();
             if (userData) {
                 nameInput.value = userData.name || '';
-                phoneInput.value = userData.phone || '';
+                phoneInput.value = userData.phone || '+7';
             }
             orderFormModal.classList.remove('hidden');
             orderFormModal.classList.add('modal-enter');
