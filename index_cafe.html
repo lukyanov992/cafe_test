@@ -49,61 +49,6 @@
             100% { stroke-dashoffset: 0; }
         }
         
-        /* Styles for the order progress bar */
-        .order-status-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            width: 100%;
-            margin-top: 1rem;
-        }
-        .status-step {
-            position: relative;
-            z-index: 10;
-            width: 1rem;
-            height: 1rem;
-            border-radius: 9999px;
-            background-color: #4a5568; /* bg-gray-600 */
-            transition: all 0.3s ease-in-out;
-            border: 2px solid transparent;
-        }
-        .status-line {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 4px;
-            background-color: #4a5568; /* bg-gray-600 */
-            transition: all 0.5s ease-in-out;
-            z-index: 5;
-        }
-        
-        .status-label {
-            position: absolute;
-            top: 1.5rem;
-            font-size: 0.65rem;
-            text-align: center;
-            white-space: nowrap;
-            color: #a0aec0; /* text-gray-400 */
-            width: 80px; /* Fixed width for centering */
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        .status-label.active {
-            color: #10b981; /* text-green-500 */
-        }
-        
-        /* Progress bar fill animation */
-        .progress-fill-animation {
-            animation: progress-fill 3s ease-out forwards;
-        }
-        
-        @keyframes progress-fill {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-        
         /* Styles for the bottom cart panel */
         #bottom-cart-menu {
             position: fixed;
@@ -165,44 +110,15 @@
                 <!-- Categories section -->
                 <section class="mb-6" id="category-section">
                     <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-                        <button data-category="burgers" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-[#AB3031] text-white">Бургеры</button>
-                        <button data-category="pizza" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Пицца</button>
-                        <button data-category="snacks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Закуски</button>
-                        <button data-category="drinks" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Напитки</button>
+                        <!-- Category buttons will be rendered here by JS -->
                     </div>
                 </section>
 
                 <!-- Menu sections -->
                 <section class="menu-container space-y-4 sm:space-y-6 hide-scrollbar h-[70vh] lg:h-[55vh] overflow-y-auto pr-2">
-                    <div id="burgers-section" class="category-section">
-                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Бургеры</h2>
-                        <div id="burgers-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Burgers will be rendered here by JS -->
-                        </div>
-                    </div>
-
-                    <div id="pizza-section" class="category-section hidden">
-                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Пицца</h2>
-                        <div id="pizza-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Pizza will be rendered here by JS -->
-                        </div>
-                    </div>
-
-                    <div id="snacks-section" class="category-section hidden">
-                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Закуски</h2>
-                        <div id="snacks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Snacks will be rendered here by JS -->
-                        </div>
-                    </div>
-
-                    <div id="drinks-section" class="category-section hidden">
-                        <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">Напитки</h2>
-                        <div id="drinks-list" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Drinks will be rendered here by JS -->
-                        </div>
-                    </div>
-                    <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
+                    <!-- Menu categories and items will be rendered here by JS -->
                 </section>
+                <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
             </div>
 
             <!-- Cart container (hidden by default) -->
@@ -232,10 +148,15 @@
                         Оформить заказ
                     </button>
                 </div>
+                <!-- Кнопка "На главную" добавлена в корзину -->
+                <button id="back-to-main-btn-cart" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span>На главную</span>
+                </button>
             </div>
 
             <!-- Profile container (hidden by default) -->
-            <div id="profile-view" class="hidden h-full">
+            <div id="profile-view" class="hidden h-full flex flex-col">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Профиль</h2>
                 <!-- User data block -->
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-6">
@@ -260,13 +181,126 @@
                 </div>
 
                 <!-- Order history block -->
-                <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner h-fit overflow-y-auto">
+                <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner flex-grow h-fit overflow-y-auto">
                     <h3 class="text-lg font-bold mb-4">История заказов</h3>
                     <div id="order-history-container" class="space-y-4">
                         <p class="text-gray-400 italic text-sm md:text-base text-center">У вас пока нет заказов.</p>
                         <!-- Order history will be rendered here -->
                     </div>
                 </div>
+                <!-- Кнопка "На главную" добавлена в профиль -->
+                <button id="back-to-main-btn-profile" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span>На главную</span>
+                </button>
+                <!-- Кнопка админ-панели -->
+                <button id="admin-panel-btn" class="w-full mt-2 bg-[#191919] border border-gray-600 text-gray-400 py-2 px-6 rounded-full shadow-lg text-sm transition-colors hover:bg-gray-800 hover:text-white">
+                    Панель администратора
+                </button>
+            </div>
+
+            <!-- Admin panel container (hidden by default) -->
+            <div id="admin-view" class="hidden h-full flex flex-col">
+                <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Панель администратора</h2>
+                
+                <!-- Admin panel navigation tabs -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button data-admin-tab="stories" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-[#AB3031] text-white">Истории</button>
+                    <button data-admin-tab="items" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Товары</button>
+                    <button data-admin-tab="categories" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Категории</button>
+                    <button data-admin-tab="orders" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Заказы</button>
+                    <button data-admin-tab="users" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Пользователи</button>
+                </div>
+
+                <div class="admin-content-section h-full overflow-y-auto pr-2 space-y-6">
+                    <!-- Admin Stories management section -->
+                    <div id="admin-stories" class="admin-tab-content space-y-4">
+                        <h3 class="text-xl font-bold">Управление историями</h3>
+                        <form id="story-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
+                            <div>
+                                <label for="story-image-url" class="block text-sm font-medium text-gray-400">URL изображения</label>
+                                <input type="text" id="story-image-url" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="https://placehold.co/900x1600/...">
+                            </div>
+                            <div>
+                                <label for="story-text-content" class="block text-sm font-medium text-gray-400">Текст истории</label>
+                                <input type="text" id="story-text-content" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="Новый комбо-набор!">
+                            </div>
+                            <button type="submit" class="w-full bg-[#AB3031] text-white py-2 rounded-full font-bold transition-colors hover:bg-[#972C2C]">Добавить/Обновить историю</button>
+                        </form>
+                        <ul id="stories-list" class="space-y-4"></ul>
+                    </div>
+                    
+                    <!-- Admin Items management section -->
+                    <div id="admin-items" class="admin-tab-content hidden space-y-4">
+                        <h3 class="text-xl font-bold">Управление товарами</h3>
+                        <form id="item-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
+                            <div>
+                                <label for="item-id" class="block text-sm font-medium text-gray-400">ID товара (генерируется)</label>
+                                <input type="text" id="item-id" class="mt-1 block w-full bg-gray-700 text-gray-500 rounded-md p-2 cursor-not-allowed" disabled>
+                            </div>
+                            <div>
+                                <label for="item-name" class="block text-sm font-medium text-gray-400">Название</label>
+                                <input type="text" id="item-name" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="Название товара" required>
+                            </div>
+                            <div>
+                                <label for="item-price" class="block text-sm font-medium text-gray-400">Цена</label>
+                                <input type="number" id="item-price" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="100" required>
+                            </div>
+                            <div>
+                                <label for="item-image" class="block text-sm font-medium text-gray-400">URL изображения</label>
+                                <input type="text" id="item-image" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="https://placehold.co/...">
+                            </div>
+                            <div>
+                                <label for="item-category" class="block text-sm font-medium text-gray-400">Категория</label>
+                                <select id="item-category" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" required></select>
+                            </div>
+                            <button type="submit" class="w-full bg-[#AB3031] text-white py-2 rounded-full font-bold transition-colors hover:bg-[#972C2C]">Добавить/Обновить товар</button>
+                        </form>
+                        <div id="items-list" class="space-y-4"></div>
+                    </div>
+
+                    <!-- Admin Categories management section -->
+                    <div id="admin-categories" class="admin-tab-content hidden space-y-4">
+                         <h3 class="text-xl font-bold">Управление категориями</h3>
+                         <form id="category-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
+                             <div>
+                                 <label for="category-id" class="block text-sm font-medium text-gray-400">ID категории (латиница, без пробелов)</label>
+                                 <input type="text" id="category-id" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="burgers" required>
+                             </div>
+                             <div>
+                                 <label for="category-name" class="block text-sm font-medium text-gray-400">Название категории</label>
+                                 <input type="text" id="category-name" class="mt-1 block w-full bg-gray-700 text-white rounded-md p-2" placeholder="Бургеры" required>
+                             </div>
+                             <button type="submit" class="w-full bg-[#AB3031] text-white py-2 rounded-full font-bold transition-colors hover:bg-[#972C2C]">Добавить категорию</button>
+                         </form>
+                         <ul id="categories-list" class="space-y-4"></ul>
+                    </div>
+
+                    <!-- Admin Orders history section -->
+                    <div id="admin-orders" class="admin-tab-content hidden space-y-4">
+                        <h3 class="text-xl font-bold">История заказов</h3>
+                        <div id="admin-orders-list" class="space-y-4">
+                            <p class="text-gray-400 italic text-sm md:text-base text-center">Заказов пока нет.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Users management section -->
+                    <div id="admin-users" class="admin-tab-content hidden space-y-4">
+                        <h3 class="text-xl font-bold">Управление пользователями</h3>
+                        <div id="admin-users-list" class="space-y-4">
+                            <div class="bg-gray-800 p-4 rounded-xl">
+                                <p class="text-gray-400 italic text-sm md:text-base text-center">Данные пользователя сохраняются локально.</p>
+                                <button id="clear-user-data-btn" class="w-full mt-4 bg-red-600 text-white py-2 rounded-full font-bold transition-colors hover:bg-red-700">Очистить данные пользователя</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                 <!-- Кнопка "На главную" для админ-панели -->
+                <button id="back-to-main-btn-admin" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <span>На главную</span>
+                </button>
             </div>
 
         </div>
@@ -278,12 +312,6 @@
         <span id="bottom-cart-total-sum" class="font-bold text-lg">0 ₽</span>
     </button>
     
-    <!-- "Back to Main" button (hidden by default) -->
-    <button id="back-to-main-btn" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        <span>На главную</span>
-    </button>
-
     <!-- Pickup modal window -->
     <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
@@ -414,9 +442,19 @@
         <button id="next-story-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&gt;</button>
     </div>
 
+    <!-- Password modal window for admin panel -->
+    <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
+        <div class="bg-[#191919] text-white rounded-2xl p-6 m-4 max-w-xs w-full shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-center">Введите пароль</h3>
+            <input type="password" id="password-input" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base" placeholder="Пароль">
+            <p id="password-error" class="text-red-400 text-xs mt-2 hidden text-center">Неверный пароль</p>
+            <button id="password-submit-btn" class="w-full bg-[#AB3031] text-white py-2 rounded-full font-bold mt-4 transition-colors hover:bg-[#972C2C]">Войти</button>
+        </div>
+    </div>
+    
     <script>
-        // Data for menu items
-        const menuItems = {
+        // Default data for menu items and stories, will be overwritten by localStorage
+        const defaultMenuItems = {
             burgers: [
                 { id: 'burger_1', name: 'Классический бургер', price: 350, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер', category: 'burgers' },
                 { id: 'burger_2', name: 'Острый бургер', price: 400, image: 'https://placehold.co/400x400/241E1B/ffffff?text=Бургер', category: 'burgers' },
@@ -439,10 +477,7 @@
             ]
         };
 
-        const allMenuItems = Object.values(menuItems).flat();
-
-        // Data for stories
-        const storyData = [
+        const defaultStories = [
             {
                 image: 'https://placehold.co/900x1600/AB3031/ffffff?text=Новый+комбо-набор',
                 text: 'Новый комбо-набор уже в продаже!'
@@ -456,6 +491,12 @@
                 text: 'Спецпредложение недели: двойной чизбургер!'
             }
         ];
+
+        // Load data from localStorage or use defaults
+        let menuItems = JSON.parse(localStorage.getItem('menuItems')) || defaultMenuItems;
+        let storyData = JSON.parse(localStorage.getItem('storyData')) || defaultStories;
+        
+        let allMenuItems = Object.values(menuItems).flat();
         
         // Cart data storage (Map for efficiency)
         let cart = new Map();
@@ -468,6 +509,7 @@
         const menuView = document.getElementById('menu-view');
         const cartView = document.getElementById('cart-view');
         const profileView = document.getElementById('profile-view');
+        const adminView = document.getElementById('admin-view');
         const cartItemsContainer = document.getElementById('cart-items-container');
         const placeOrderBtn = document.getElementById('place-order-btn');
         const placeOrderWrapper = document.getElementById('place-order-wrapper');
@@ -478,12 +520,21 @@
         const cartPickupLocationBtn = document.getElementById('cart-pickup-location-btn');
         const suggestedItemsList = document.getElementById('suggested-items-list');
         const suggestedItemsSection = document.getElementById('suggested-items-section');
-        const backToMainBtn = document.getElementById('back-to-main-btn');
+        
+        // Получаем новые кнопки "На главную"
+        const backToMainBtnCart = document.getElementById('back-to-main-btn-cart');
+        const backToMainBtnProfile = document.getElementById('back-to-main-btn-profile');
+        const backToMainBtnAdmin = document.getElementById('back-to-main-btn-admin');
+        const adminPanelBtn = document.getElementById('admin-panel-btn');
         
         const pickupModal = document.getElementById('pickup-modal');
         const storyModal = document.getElementById('story-modal');
         const orderFormModal = document.getElementById('order-form-modal');
         const confirmationModal = document.getElementById('confirmation-modal');
+        const passwordModal = document.getElementById('password-modal');
+        const passwordInput = document.getElementById('password-input');
+        const passwordError = document.getElementById('password-error');
+        const passwordSubmitBtn = document.getElementById('password-submit-btn');
         const closePickupModalBtn = document.getElementById('close-modal-btn');
         const closeStoryModalBtn = document.getElementById('close-story-modal-btn');
         const closeOrderFormBtn = document.getElementById('close-order-form-btn');
@@ -514,9 +565,29 @@
         const saveProfileText = document.getElementById('save-text');
         const orderHistoryContainer = document.getElementById('order-history-container');
         
+        // Admin Panel elements
+        const adminTabButtons = document.querySelectorAll('.admin-tab-btn');
+        const adminTabContents = document.querySelectorAll('.admin-tab-content');
+        const storiesList = document.getElementById('stories-list');
+        const storyForm = document.getElementById('story-form');
+        const storyImageUrlInput = document.getElementById('story-image-url');
+        const storyTextContentInput = document.getElementById('story-text-content');
+        const itemsList = document.getElementById('items-list');
+        const itemForm = document.getElementById('item-form');
+        const itemIdInput = document.getElementById('item-id');
+        const itemNameInput = document.getElementById('item-name');
+        const itemPriceInput = document.getElementById('item-price');
+        const itemImageInput = document.getElementById('item-image');
+        const itemCategorySelect = document.getElementById('item-category');
+        const categoriesList = document.getElementById('categories-list');
+        const categoryForm = document.getElementById('category-form');
+        const categoryIdInput = document.getElementById('category-id');
+        const categoryNameInput = document.getElementById('category-name');
+        const adminOrdersList = document.getElementById('admin-orders-list');
+        const clearUserDataBtn = document.getElementById('clear-user-data-btn');
+
         let currentStoryIndex = 0;
         let storyProgressInterval;
-        let touchStartX = 0;
         let isProfileEditing = false;
         
         const pickupAddresses = document.querySelectorAll('.pickup-location-btn');
@@ -525,28 +596,55 @@
         // Regex for Russian phone number validation (+7 and 10 digits)
         const phoneRegex = /^\+7\d{10}$/;
         
-        // Animation variables
-        const STATUS_TRANSITION_DURATION = 3000; // 3 seconds per stage
-
         // Initialize state variables for the order form
         let selectedDeliveryMethod = 'на подносе';
         let selectedPaymentMethod = 'card';
         let selectedPickupTime = 'asap';
         
-        // Keeps track of ongoing animations to prevent duplicates
-        const activeAnimations = new Map();
-
         // Initialize on DOMContentLoaded
         document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
             renderStories();
             renderAllMenuItems();
+            renderCategoryTabs();
             attachEventListeners();
             showView('menu');
-            updateCategoryButtons('burgers');
+            updateCategoryButtons(Object.keys(menuItems)[0]);
             setInitialPickupLocation();
             updateOrderFormUI();
         });
         
+        /**
+         * Loads all data from localStorage into global variables.
+         */
+        function loadAllData() {
+             const storedMenuItems = localStorage.getItem('menuItems');
+             if (storedMenuItems) {
+                 menuItems = JSON.parse(storedMenuItems);
+             }
+             const storedStories = localStorage.getItem('storyData');
+             if (storedStories) {
+                 storyData = JSON.parse(storedStories);
+             }
+             allMenuItems = Object.values(menuItems).flat();
+        }
+        
+        /**
+         * Saves all data to localStorage.
+         */
+        function saveAllData() {
+            localStorage.setItem('menuItems', JSON.stringify(menuItems));
+            localStorage.setItem('storyData', JSON.stringify(storyData));
+        }
+
+        /**
+         * Generates a unique ID for a new item.
+         * @returns {string} The new ID.
+         */
+        function generateId(prefix = 'item') {
+            return `${prefix}_${Date.now()}`;
+        }
+
         /**
          * Handles phone number input, ensuring it starts with +7 and contains only 10 digits.
          * @param {Event} e The input event.
@@ -662,9 +760,13 @@
             // Top right profile button
             topProfileBtn.addEventListener('click', () => showView('profile'));
             
-            // Bottom cart menu and Back to Main button listeners
+            // Bottom cart menu and new "Back to Main" button listeners
             bottomCartMenu.addEventListener('click', () => showView('cart'));
-            backToMainBtn.addEventListener('click', () => showView('menu'));
+            
+            // Добавляем слушатели событий для новых кнопок "На главную"
+            backToMainBtnCart.addEventListener('click', () => showView('menu'));
+            backToMainBtnProfile.addEventListener('click', () => showView('menu'));
+            backToMainBtnAdmin.addEventListener('click', () => showView('menu'));
 
             // Category buttons
             categoryTabs.addEventListener('click', (e) => {
@@ -674,8 +776,369 @@
                     showCategory(category);
                 }
             });
+            
+            // Admin Panel button
+            adminPanelBtn.addEventListener('click', showPasswordPrompt);
+            passwordSubmitBtn.addEventListener('click', checkPassword);
+            
+            // Admin panel tabs
+            adminTabButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.target.dataset.adminTab;
+                    showAdminTab(tab);
+                });
+            });
+
+            // Admin forms
+            storyForm.addEventListener('submit', handleStoryFormSubmit);
+            itemForm.addEventListener('submit', handleItemFormSubmit);
+            categoryForm.addEventListener('submit', handleCategoryFormSubmit);
+            clearUserDataBtn.addEventListener('click', clearUserData);
         }
         
+        /**
+         * Toggles the admin view tabs.
+         * @param {string} tab The tab to show.
+         */
+        function showAdminTab(tab) {
+            adminTabButtons.forEach(btn => {
+                if (btn.dataset.adminTab === tab) {
+                    btn.classList.add('bg-[#AB3031]', 'text-white');
+                    btn.classList.remove('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+                } else {
+                    btn.classList.remove('bg-[#AB3031]', 'text-white');
+                    btn.classList.add('bg-gray-800', 'text-white', 'hover:bg-gray-700');
+                }
+            });
+
+            adminTabContents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.getElementById(`admin-${tab}`).classList.remove('hidden');
+
+            // Render content for the active tab
+            if (tab === 'stories') {
+                renderAdminStories();
+            } else if (tab === 'items') {
+                renderAdminItems();
+                renderCategoryOptions();
+            } else if (tab === 'categories') {
+                renderAdminCategories();
+            } else if (tab === 'orders') {
+                renderAdminOrders();
+            } else if (tab === 'users') {
+                renderAdminUsers();
+            }
+        }
+
+        /**
+         * Shows the password modal for the admin panel.
+         */
+        function showPasswordPrompt() {
+            passwordModal.classList.remove('hidden');
+            passwordModal.classList.add('modal-enter');
+            passwordInput.value = '';
+            passwordInput.focus();
+        }
+
+        /**
+         * Checks the password and shows the admin view.
+         */
+        function checkPassword() {
+            const password = passwordInput.value;
+            if (password === '00000') {
+                hideModal(passwordModal);
+                showView('admin');
+                showAdminTab('stories'); // Show default admin tab
+            } else {
+                passwordError.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Renders the list of stories in the admin panel.
+         */
+        function renderAdminStories() {
+            storiesList.innerHTML = storyData.map((story, index) => `
+                <li class="bg-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 flex-grow">
+                        <img src="${story.image}" alt="Story" class="w-16 h-16 rounded-full object-cover">
+                        <span class="text-sm font-medium truncate">${story.text}</span>
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button class="edit-story-btn bg-[#AB3031] text-white p-2 rounded-full hover:bg-[#972C2C] transition-colors" data-index="${index}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                        <button class="delete-story-btn bg-gray-600 text-white p-2 rounded-full hover:bg-red-500 transition-colors" data-index="${index}">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5L14.5 3h-5L8.5 4H5v2h14V4z"/></svg>
+                        </button>
+                    </div>
+                </li>
+            `).join('');
+
+            document.querySelectorAll('.delete-story-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    storyData.splice(index, 1);
+                    saveAllData();
+                    renderAdminStories();
+                    renderStories();
+                });
+            });
+
+            document.querySelectorAll('.edit-story-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    const story = storyData[index];
+                    storyImageUrlInput.value = story.image;
+                    storyTextContentInput.value = story.text;
+                    storyForm.dataset.editIndex = index;
+                });
+            });
+        }
+        
+        /**
+         * Handles the story form submission.
+         * @param {Event} e The event object.
+         */
+        function handleStoryFormSubmit(e) {
+            e.preventDefault();
+            const imageUrl = storyImageUrlInput.value.trim();
+            const textContent = storyTextContentInput.value.trim();
+            const editIndex = storyForm.dataset.editIndex;
+
+            if (imageUrl && textContent) {
+                if (editIndex !== undefined) {
+                    // Edit existing story
+                    storyData[editIndex] = { image: imageUrl, text: textContent };
+                    delete storyForm.dataset.editIndex;
+                } else {
+                    // Add new story
+                    storyData.push({ image: imageUrl, text: textContent });
+                }
+                saveAllData();
+                renderAdminStories();
+                renderStories();
+                storyForm.reset();
+            }
+        }
+
+        /**
+         * Renders the list of items in the admin panel.
+         */
+        function renderAdminItems() {
+             itemsList.innerHTML = '';
+             Object.keys(menuItems).forEach(category => {
+                 itemsList.innerHTML += `<h4 class="font-bold text-lg mt-4">${menuItems[category].find(i=>i.category === category)?.category || category}</h4>`;
+                 menuItems[category].forEach(item => {
+                      itemsList.innerHTML += `
+                          <div class="bg-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+                              <div class="flex items-center gap-4 flex-grow">
+                                  <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-full object-cover">
+                                  <div class="flex-grow">
+                                      <p class="font-bold">${item.name}</p>
+                                      <p class="text-sm text-gray-400">${item.price} ₽</p>
+                                  </div>
+                              </div>
+                              <div class="flex gap-2 flex-shrink-0">
+                                  <button class="edit-item-btn bg-[#AB3031] text-white p-2 rounded-full hover:bg-[#972C2C] transition-colors" data-id="${item.id}">
+                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                  </button>
+                                  <button class="delete-item-btn bg-gray-600 text-white p-2 rounded-full hover:bg-red-500 transition-colors" data-id="${item.id}">
+                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5L14.5 3h-5L8.5 4H5v2h14V4z"/></svg>
+                                  </button>
+                              </div>
+                          </div>
+                      `;
+                 });
+             });
+             attachItemAdminEventListeners();
+        }
+        
+        /**
+         * Attaches event listeners for admin item management.
+         */
+        function attachItemAdminEventListeners() {
+            document.querySelectorAll('.edit-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const itemId = e.currentTarget.dataset.id;
+                    const item = allMenuItems.find(i => i.id === itemId);
+                    if (item) {
+                        itemIdInput.value = item.id;
+                        itemNameInput.value = item.name;
+                        itemPriceInput.value = item.price;
+                        itemImageInput.value = item.image;
+                        itemCategorySelect.value = item.category;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-item-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const itemId = e.currentTarget.dataset.id;
+                    const item = allMenuItems.find(i => i.id === itemId);
+                    if (item) {
+                        menuItems[item.category] = menuItems[item.category].filter(i => i.id !== itemId);
+                        allMenuItems = Object.values(menuItems).flat();
+                        saveAllData();
+                        renderAllMenuItems();
+                        renderAdminItems();
+                        updateCategoryButtons(Object.keys(menuItems)[0]);
+                    }
+                });
+            });
+        }
+
+        /**
+         * Renders the category options in the item form.
+         */
+        function renderCategoryOptions() {
+            itemCategorySelect.innerHTML = Object.keys(menuItems).map(key => `
+                 <option value="${key}">${menuItems[key][0]?.category || key}</option>
+            `).join('');
+        }
+
+        /**
+         * Handles the item form submission.
+         * @param {Event} e The event object.
+         */
+        function handleItemFormSubmit(e) {
+            e.preventDefault();
+            const itemId = itemIdInput.value || generateId('item');
+            const item = {
+                id: itemId,
+                name: itemNameInput.value.trim(),
+                price: parseInt(itemPriceInput.value, 10),
+                image: itemImageInput.value.trim() || `https://placehold.co/400x400/241E1B/ffffff?text=${itemNameInput.value.trim()}`,
+                category: itemCategorySelect.value
+            };
+
+            // Remove existing item if editing
+            Object.keys(menuItems).forEach(key => {
+                 menuItems[key] = menuItems[key].filter(i => i.id !== itemId);
+            });
+            
+            // Add or update the item
+            if (!menuItems[item.category]) {
+                menuItems[item.category] = [];
+            }
+            menuItems[item.category].push(item);
+            allMenuItems = Object.values(menuItems).flat();
+            saveAllData();
+            renderAllMenuItems();
+            renderAdminItems();
+            itemForm.reset();
+            itemIdInput.value = '';
+        }
+
+        /**
+         * Renders the list of categories in the admin panel.
+         */
+        function renderAdminCategories() {
+            categoriesList.innerHTML = Object.keys(menuItems).map(key => `
+                <li class="bg-gray-800 p-4 rounded-xl flex items-center justify-between gap-4">
+                     <span class="text-sm font-medium">${key}</span>
+                     <button class="delete-category-btn bg-gray-600 text-white p-2 rounded-full hover:bg-red-500 transition-colors" data-id="${key}">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5L14.5 3h-5L8.5 4H5v2h14V4z"/></svg>
+                     </button>
+                </li>
+            `).join('');
+
+            document.querySelectorAll('.delete-category-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const categoryId = e.currentTarget.dataset.id;
+                    delete menuItems[categoryId];
+                    saveAllData();
+                    renderCategoryTabs();
+                    renderAllMenuItems();
+                    renderAdminCategories();
+                    renderCategoryOptions();
+                    updateCategoryButtons(Object.keys(menuItems)[0]);
+                });
+            });
+        }
+        
+        /**
+         * Handles the category form submission.
+         * @param {Event} e The event object.
+         */
+        function handleCategoryFormSubmit(e) {
+            e.preventDefault();
+            const categoryId = categoryIdInput.value.trim().toLowerCase();
+            const categoryName = categoryNameInput.value.trim();
+
+            if (categoryId && categoryName) {
+                if (!menuItems[categoryId]) {
+                    menuItems[categoryId] = [];
+                }
+                saveAllData();
+                renderCategoryTabs();
+                renderAdminCategories();
+                renderCategoryOptions();
+                categoryForm.reset();
+                updateCategoryButtons(categoryId);
+            }
+        }
+
+        /**
+         * Renders all order history in the admin panel.
+         */
+        function renderAdminOrders() {
+            const allOrders = loadOrderHistory();
+            adminOrdersList.innerHTML = '';
+
+            if (allOrders.length === 0) {
+                adminOrdersList.innerHTML = '<p class="text-gray-400 italic text-sm md:text-base text-center">Заказов пока нет.</p>';
+                return;
+            }
+
+            allOrders.forEach(order => {
+                const itemsList = order.items.map(item => `
+                    <li class="flex justify-between items-center text-gray-400 text-xs md:text-sm">
+                        <span>${item.name} (${item.quantity} шт)</span>
+                        <span>${item.price * item.quantity} ₽</span>
+                    </li>
+                `).join('');
+                
+                const orderCard = `
+                    <div class="bg-gray-800 p-4 rounded-xl shadow-md">
+                        <div class="flex justify-between items-center mb-2 font-bold text-sm">
+                            <span>Заказ № ${order.orderNumber}</span>
+                            <span>${order.total} ₽</span>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-2">
+                            <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${order.paymentMethod}</span><br>
+                            <span>Место: ${order.location}</span> | <span>Дата: ${order.date}</span> | <span>Время: ${order.time}</span>
+                        </div>
+                        <ul class="space-y-1">
+                            ${itemsList}
+                        </ul>
+                    </div>
+                `;
+                adminOrdersList.innerHTML += orderCard;
+            });
+        }
+        
+        /**
+         * Renders user data in the admin panel.
+         */
+        function renderAdminUsers() {
+            // User data is handled by `clearUserData` for simplicity, as it's a single object
+        }
+        
+        /**
+         * Clears all user data from localStorage.
+         */
+        function clearUserData() {
+            localStorage.removeItem('userData');
+            localStorage.removeItem('orderHistory');
+            profileNameInput.value = '';
+            profilePhoneInput.value = '+7';
+            renderOrderHistory(); // Rerender profile order history
+            renderAdminOrders(); // Rerender admin orders
+        }
+
         /**
          * Updates the style of buttons in the order form.
          * @param {HTMLElement} activeBtn The clicked button.
@@ -825,7 +1288,7 @@
                 `).join('');
                 
                 const orderCard = `
-                    <div class="bg-gray-800 p-3 rounded-xl shadow-md" data-order-number="${order.orderNumber}">
+                    <div class="bg-gray-800 p-3 rounded-xl shadow-md">
                         <div class="flex justify-between items-center mb-2 font-bold text-sm">
                             <span>Заказ № ${order.orderNumber}</span>
                             <span>${order.total} ₽</span>
@@ -834,113 +1297,27 @@
                             <span>Получение: ${order.deliveryMethod}</span> | <span>Оплата: ${order.paymentMethod}</span><br>
                             <span>Место: ${order.location}</span> | <span>Дата: ${order.date}</span> | <span>Время: ${order.time}</span>
                         </div>
-                        <ul class="space-y-1 text-sm md:text-base mb-4">
+                        <ul class="space-y-1 text-sm md:text-base">
                             ${itemsList}
                         </ul>
-                        <!-- Order progress bar -->
-                        <div class="order-status-bar relative w-full mb-8">
-                            <div class="status-line h-1 bg-[#10b981] rounded-full" id="progress-line-${order.orderNumber}" style="width: 0%;"></div>
-                            <div class="status-step-container relative flex justify-between z-10">
-                                <div class="status-step w-4 h-4 rounded-full bg-[#10b981]"></div>
-                                <div class="status-step w-4 h-4 rounded-full bg-gray-600" id="step-preparing-${order.orderNumber}"></div>
-                                <div class="status-step w-4 h-4 rounded-full bg-gray-600" id="step-ready-${order.orderNumber}"></div>
-                            </div>
-                            <div class="status-label-container flex justify-between absolute w-full top-6">
-                                <span class="text-xs text-center text-[#10b981]">Принят</span>
-                                <span class="text-xs text-center text-gray-400" id="label-preparing-${order.orderNumber}">Готовится</span>
-                                <span class="text-xs text-center text-gray-400" id="label-ready-${order.orderNumber}">Готов</span>
-                            </div>
-                        </div>
                     </div>
                 `;
                 orderHistoryContainer.innerHTML += orderCard;
             });
-            
-            // Start animations for each order
-            history.forEach(order => {
-                const orderDate = new Date(order.timestamp);
-                const timeSinceOrder = new Date() - orderDate;
-                animateOrderProgress(order.orderNumber, timeSinceOrder);
-            });
         }
         
         /**
-         * Animates the order progress bar.
-         * @param {string} orderNumber The order number.
-         * @param {number} elapsedTime The time elapsed since the order was placed in milliseconds.
-         */
-        function animateOrderProgress(orderNumber, elapsedTime) {
-            const progressLine = document.getElementById(`progress-line-${orderNumber}`);
-            const stepPreparing = document.getElementById(`step-preparing-${orderNumber}`);
-            const stepReady = document.getElementById(`step-ready-${orderNumber}`);
-            const labelPreparing = document.getElementById(`label-preparing-${orderNumber}`);
-            const labelReady = document.getElementById(`label-ready-${orderNumber}`);
-
-            if (!progressLine) return; // Guard against non-existent elements
-
-            // Check if animation is already running
-            if (activeAnimations.has(orderNumber)) {
-                return;
-            }
-
-            let startTimestamp = null;
-            let currentStatus = 'accepted';
-            let progress = 0;
-            let totalTime = 0;
-
-            const updateProgress = (timestamp) => {
-                if (!startTimestamp) {
-                    startTimestamp = timestamp;
-                }
-                
-                const elapsed = timestamp - startTimestamp;
-                let currentProgress = (elapsed + elapsedTime) / STATUS_TRANSITION_DURATION;
-
-                if (currentStatus === 'accepted') {
-                    progress = Math.min(currentProgress * 50, 50);
-                    if (progress === 50) {
-                        currentStatus = 'preparing';
-                        stepPreparing.classList.remove('bg-gray-600');
-                        stepPreparing.classList.add('bg-[#10b981]');
-                        labelPreparing.classList.add('text-[#10b981]');
-                        startTimestamp = timestamp;
-                    }
-                } else if (currentStatus === 'preparing') {
-                    progress = Math.min(50 + (currentProgress * 50), 100);
-                    if (progress === 100) {
-                        currentStatus = 'ready';
-                        stepReady.classList.remove('bg-gray-600');
-                        stepReady.classList.add('bg-[#10b981]');
-                        labelReady.classList.add('text-[#10b981]');
-                    }
-                } else if (currentStatus === 'ready') {
-                    progress = 100;
-                }
-
-                progressLine.style.width = `${progress}%`;
-
-                if (progress < 100) {
-                    activeAnimations.set(orderNumber, requestAnimationFrame(updateProgress));
-                } else {
-                    activeAnimations.delete(orderNumber);
-                }
-            };
-
-            activeAnimations.set(orderNumber, requestAnimationFrame(updateProgress));
-        }
-
-        /**
-         * Switches the active view (menu, cart, profile).
-         * @param {string} viewName The name of the view to show ('menu', 'cart', 'profile').
+         * Switches the active view (menu, cart, profile, admin).
+         * @param {string} viewName The name of the view to show.
          */
         function showView(viewName) {
             menuView.classList.add('hidden');
             cartView.classList.add('hidden');
             profileView.classList.add('hidden');
+            adminView.classList.add('hidden');
             bottomCartMenu.classList.remove('visible');
-            backToMainBtn.classList.add('hidden');
             
-            // Hide header buttons in cart and profile views
+            // Hide header buttons in all views except menu
             pickupButton.classList.add('hidden');
             topProfileBtn.classList.add('hidden');
 
@@ -952,12 +1329,13 @@
                 topProfileBtn.classList.remove('hidden');
             } else if (viewName === 'cart') {
                 cartView.classList.remove('hidden');
-                backToMainBtn.classList.remove('hidden');
                 renderCart();
             } else if (viewName === 'profile') {
                 profileView.classList.remove('hidden');
-                backToMainBtn.classList.remove('hidden');
                 updateProfileUI();
+            } else if (viewName === 'admin') {
+                adminView.classList.remove('hidden');
+                showAdminTab('stories');
             }
         }
 
@@ -1010,6 +1388,7 @@
             setTimeout(() => {
                 modalElement.classList.add('hidden');
                 modalElement.classList.remove('modal-leave');
+                passwordError.classList.add('hidden'); // Also hide error message on modal close
             }, 300);
         }
 
@@ -1088,25 +1467,64 @@
          * Renders all menu items.
          */
         function renderAllMenuItems() {
+            const menuContainer = document.querySelector('.menu-container');
+            if (menuContainer) {
+                 menuContainer.innerHTML = '';
+            }
+
+            // Render category buttons and sections
+            renderCategoryTabs();
+
             Object.keys(menuItems).forEach(category => {
-                const listContainer = document.getElementById(`${category}-list`);
-                if (listContainer) {
-                    listContainer.innerHTML = ''; // Clear container before rendering
-                    menuItems[category].forEach(item => {
-                        listContainer.innerHTML += `
-                            <div id="item-${item.id}" class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
-                                <img src="${item.image}" alt="${item.name}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-2 object-cover">
-                                <h3 class="font-bold text-sm sm:text-base">${item.name}</h3>
-                                <p class="text-xs sm:text-sm text-gray-400 my-1">${item.price} ₽</p>
-                                <div id="item-control-${item.id}" class="w-full">
-                                    ${createItemControlHtml(item)}
-                                </div>
-                            </div>
-                        `;
-                    });
+                const categoryTitle = `
+                    <h2 class="category-title text-lg sm:text-xl md:text-2xl font-bold text-white mb-4 sticky top-0 bg-[#191919] z-10 pb-2">${category}</h2>
+                `;
+                const listContainer = document.createElement('div');
+                listContainer.id = `${category}-section`;
+                listContainer.className = 'category-section';
+                if (category !== Object.keys(menuItems)[0]) {
+                     listContainer.classList.add('hidden');
                 }
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'grid grid-cols-2 lg:grid-cols-3 gap-4';
+                gridContainer.id = `${category}-list`;
+
+                menuItems[category].forEach(item => {
+                    gridContainer.innerHTML += `
+                        <div id="item-${item.id}" class="bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
+                            <img src="${item.image}" alt="${item.name}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-2 object-cover">
+                            <h3 class="font-bold text-sm sm:text-base">${item.name}</h3>
+                            <p class="text-xs sm:text-sm text-gray-400 my-1">${item.price} ₽</p>
+                            <div id="item-control-${item.id}" class="w-full">
+                                ${createItemControlHtml(item)}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                listContainer.innerHTML = categoryTitle;
+                listContainer.appendChild(gridContainer);
+                menuContainer.appendChild(listContainer);
             });
+            
+            // Add no results message
+            const noResults = document.createElement('p');
+            noResults.id = 'no-results';
+            noResults.className = 'hidden text-center text-gray-400 text-sm md:text-base';
+            noResults.textContent = 'По вашему запросу ничего не найдено.';
+            menuContainer.appendChild(noResults);
+
+            allMenuItems = Object.values(menuItems).flat();
             attachMenuItemEventListeners();
+        }
+
+        /**
+         * Renders category tabs based on the current menuItems data.
+         */
+        function renderCategoryTabs() {
+            categoryTabs.innerHTML = Object.keys(menuItems).map(category => `
+                <button data-category="${category}" class="category-btn flex-shrink-0 py-2 px-4 rounded-full font-medium text-xs sm:text-sm md:text-base transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">${category}</button>
+            `).join('');
         }
         
         /**
@@ -1180,7 +1598,7 @@
                     updateMenuItemControl(originalItem);
                 }
                 // Only update the bottom cart menu if on the menu view
-                if (!menuView.classList.contains('hidden')) {
+                if (menuView.classList.contains('hidden') === false) {
                      updateBottomCartMenu();
                 }
                 // If we are on the cart page, re-render it
@@ -1413,9 +1831,7 @@
                 date: now.toLocaleDateString('ru-RU'),
                 time: now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
                 items: Array.from(cart.values()),
-                total: total,
-                status: 'accepted',
-                timestamp: now.getTime()
+                total: total
             };
             orderHistory.unshift(orderDetails); // Add to the beginning of the array
             saveOrderHistory(orderHistory);
