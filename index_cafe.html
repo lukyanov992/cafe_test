@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fast Food Cafe</title>
-    <!-- Tailwind CSS for modern styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        // Ensure you've replaced "YOUR_API_KEY" with your actual key in the main script.
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
@@ -81,7 +83,6 @@
 
     <div id="app" class="max-w-7xl mx-auto bg-[#191919] rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 flex flex-col gap-4 sm:gap-6 md:gap-8 min-h-[calc(100vh-8rem)]">
         
-        <!-- Top header with pickup and profile buttons -->
         <header id="main-header" class="flex flex-row justify-between items-center mb-4 sm:mb-6 gap-2 md:gap-4">
             <button id="pickup-button" class="flex items-center gap-1 font-medium bg-[#241E1B] py-2 px-3 rounded-full text-white hover:bg-[#332C28] transition flex-shrink-0 text-xs sm:text-sm md:text-base">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 md:h-5 md:w-5" viewBox="0 0 24 24" fill="currentColor">
@@ -94,34 +95,25 @@
             </button>
         </header>
 
-        <!-- Main content area -->
         <div id="main-content-wrapper" class="w-full">
             
-            <!-- Menu container -->
             <div id="menu-view" class="">
-                <!-- Stories section -->
                 <section class="mb-6">
                     <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2">Истории</h2>
                     <div id="story-container" class="flex gap-2 sm:gap-4 overflow-x-auto hide-scrollbar pb-2">
-                        <!-- Stories will be rendered here by JS -->
-                    </div>
+                        </div>
                 </section>
 
-                <!-- Categories section -->
                 <section class="mb-6" id="category-section">
                     <div id="category-tabs" class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
-                        <!-- Category buttons will be rendered here by JS -->
-                    </div>
+                        </div>
                 </section>
 
-                <!-- Menu sections -->
                 <section class="menu-container space-y-4 sm:space-y-6 hide-scrollbar h-[70vh] lg:h-[55vh] overflow-y-auto pr-2">
-                    <!-- Menu categories and items will be rendered here by JS -->
-                </section>
+                    </section>
                 <p id="no-results" class="hidden text-center text-gray-400 text-sm md:text-base">По вашему запросу ничего не найдено.</p>
             </div>
 
-            <!-- Cart container (hidden by default) -->
             <div id="cart-view" class="hidden h-full flex flex-col">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Корзина</h2>
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-4">
@@ -131,34 +123,27 @@
                     </button>
                 </div>
                 <div id="cart-items-container" class="flex-grow space-y-3 hide-scrollbar overflow-y-auto pr-2">
-                    <!-- Cart items will be rendered here by JS -->
-                </div>
+                    </div>
                 
-                <!-- "Add to order" section -->
                 <section id="suggested-items-section" class="mt-6 hidden">
                     <h3 class="text-lg font-bold mb-4">Добавить к заказу</h3>
                     <div id="suggested-items-list" class="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
-                        <!-- Suggested items will be here -->
-                    </div>
+                        </div>
                 </section>
                 
-                <!-- "Place Order" button in cart -->
                 <div id="place-order-wrapper" class="mt-4">
                     <button id="place-order-btn" class="w-full bg-[#AB3031] text-white py-3 px-6 rounded-full font-bold text-sm sm:text-base transition-colors hover:bg-[#972C2C] disabled:bg-gray-700 disabled:cursor-not-allowed">
                         Оформить заказ
                     </button>
                 </div>
-                <!-- Кнопка "На главную" добавлена в корзину -->
                 <button id="back-to-main-btn-cart" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                     <span>На главную</span>
                 </button>
             </div>
 
-            <!-- Profile container (hidden by default) -->
             <div id="profile-view" class="hidden h-full flex flex-col">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Профиль</h2>
-                <!-- User data block -->
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner mb-6">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-lg font-bold">Мои данные</h3>
@@ -180,30 +165,24 @@
                     </div>
                 </div>
 
-                <!-- Order history block -->
                 <div class="bg-[#241E1B] p-4 rounded-2xl shadow-inner flex-grow h-fit overflow-y-auto">
                     <h3 class="text-lg font-bold mb-4">История заказов</h3>
                     <div id="order-history-container" class="space-y-4">
                         <p class="text-gray-400 italic text-sm md:text-base text-center">У вас пока нет заказов.</p>
-                        <!-- Order history will be rendered here -->
-                    </div>
+                        </div>
                 </div>
-                <!-- Кнопка "На главную" добавлена в профиль -->
                 <button id="back-to-main-btn-profile" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                     <span>На главную</span>
                 </button>
-                <!-- Кнопка админ-панели -->
                 <button id="admin-panel-btn" class="w-full mt-2 bg-[#191919] border border-gray-600 text-gray-400 py-2 px-6 rounded-full shadow-lg text-sm transition-colors hover:bg-gray-800 hover:text-white">
                     Панель администратора
                 </button>
             </div>
 
-            <!-- Admin panel container (hidden by default) -->
             <div id="admin-view" class="hidden h-full flex flex-col">
                 <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-white mb-4">Панель администратора</h2>
                 
-                <!-- Admin panel navigation tabs -->
                 <div class="flex flex-wrap gap-2 mb-6">
                     <button data-admin-tab="stories" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-[#AB3031] text-white">Истории</button>
                     <button data-admin-tab="items" class="admin-tab-btn py-2 px-4 rounded-full font-medium text-xs sm:text-sm transition-colors duration-300 bg-gray-800 text-white hover:bg-gray-700">Товары</button>
@@ -213,7 +192,6 @@
                 </div>
 
                 <div class="admin-content-section h-full overflow-y-auto pr-2 space-y-6">
-                    <!-- Admin Stories management section -->
                     <div id="admin-stories" class="admin-tab-content space-y-4">
                         <h3 class="text-xl font-bold">Управление историями</h3>
                         <form id="story-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
@@ -230,7 +208,6 @@
                         <ul id="stories-list" class="space-y-4"></ul>
                     </div>
                     
-                    <!-- Admin Items management section -->
                     <div id="admin-items" class="admin-tab-content hidden space-y-4">
                         <h3 class="text-xl font-bold">Управление товарами</h3>
                         <form id="item-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
@@ -259,7 +236,6 @@
                         <div id="items-list" class="space-y-4"></div>
                     </div>
 
-                    <!-- Admin Categories management section -->
                     <div id="admin-categories" class="admin-tab-content hidden space-y-4">
                          <h3 class="text-xl font-bold">Управление категориями</h3>
                          <form id="category-form" class="bg-[#241E1B] p-4 rounded-xl space-y-4">
@@ -276,7 +252,6 @@
                          <ul id="categories-list" class="space-y-4"></ul>
                     </div>
 
-                    <!-- Admin Orders history section -->
                     <div id="admin-orders" class="admin-tab-content hidden space-y-4">
                         <h3 class="text-xl font-bold">История заказов</h3>
                         <div id="admin-orders-list" class="space-y-4">
@@ -284,7 +259,6 @@
                         </div>
                     </div>
                     
-                    <!-- Admin Users management section -->
                     <div id="admin-users" class="admin-tab-content hidden space-y-4">
                         <h3 class="text-xl font-bold">Управление пользователями</h3>
                         <div id="admin-users-list" class="space-y-4">
@@ -296,8 +270,7 @@
                     </div>
 
                 </div>
-                 <!-- Кнопка "На главную" для админ-панели -->
-                <button id="back-to-main-btn-admin" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
+                 <button id="back-to-main-btn-admin" class="w-full mt-4 bg-[#241E1B] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2 transition-colors hover:bg-[#332C28]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                     <span>На главную</span>
                 </button>
@@ -306,13 +279,11 @@
         </div>
     </div>
     
-    <!-- Bottom cart panel (hidden by default) -->
     <button id="bottom-cart-menu" class="bg-[#AB3031] text-white py-3 px-6 rounded-full shadow-lg flex items-center justify-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0-12L6.1 3H4v2h2.1l3.5 7-1.3 2H17v-2H8.8l.9-2zm8.1 0-1.6-4H20v2h-2.1z"/></svg>
         <span id="bottom-cart-total-sum" class="font-bold text-lg">0 ₽</span>
     </button>
     
-    <!-- Pickup modal window -->
     <div id="pickup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -332,7 +303,6 @@
         </div>
     </div>
 
-    <!-- Order form modal window (new functionality) -->
     <div id="order-form-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-4 m-4 max-w-sm w-full shadow-2xl">
             <div class="flex justify-between items-center mb-4">
@@ -341,7 +311,6 @@
             </div>
             <form id="order-form" class="space-y-4">
                 
-                <!-- Delivery method -->
                 <div>
                     <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Способ получения</label>
                     <div class="flex gap-2">
@@ -354,7 +323,6 @@
                     </div>
                 </div>
 
-                <!-- Pickup time -->
                 <div>
                     <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Время выдачи</label>
                     <div class="flex flex-wrap gap-2">
@@ -378,7 +346,6 @@
                      <input type="time" id="custom-time" class="w-full px-4 py-2 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#AB3031] text-sm md:text-base">
                 </div>
 
-                <!-- Payment method -->
                 <div>
                     <label class="block text-xs sm:text-sm font-medium text-gray-400 mb-2">Способ оплаты</label>
                     <div class="flex gap-2">
@@ -408,7 +375,6 @@
         </div>
     </div>
     
-    <!-- Order confirmation modal window (instead of alert()) -->
     <div id="confirmation-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#111111] text-white rounded-2xl p-6 sm:p-8 m-4 max-w-sm w-full text-center shadow-2xl flex flex-col items-center">
             <div class="w-20 h-20 mb-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -422,27 +388,20 @@
         </div>
     </div>
     
-    <!-- Story view modal window -->
     <div id="story-modal" class="fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center p-4 hidden z-50 modal-enter">
-        <!-- Close button -->
         <button id="close-story-modal-btn" class="absolute top-4 right-4 text-white text-3xl leading-none z-20">&times;</button>
-        <!-- Progress bar -->
         <div id="story-progress-container" class="absolute top-4 left-0 right-0 p-4 pt-10 flex gap-2 justify-center z-10">
-            <!-- Progress bar segments will be added dynamically -->
-        </div>
-        <!-- Story content -->
+            </div>
         <div class="relative w-full max-w-xs md:max-w-sm lg:max-w-md aspect-[9/16]">
             <img id="story-image" src="" alt="Story" class="w-full h-full object-contain rounded-xl shadow-lg">
             <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black to-transparent p-4">
                 <p id="story-text" class="text-white text-sm md:text-base font-semibold text-center"></p>
             </div>
         </div>
-        <!-- Navigation buttons -->
         <button id="prev-story-btn" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&lt;</button>
         <button id="next-story-btn" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-4xl p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition-opacity z-10">&gt;</button>
     </div>
 
-    <!-- Password modal window for admin panel -->
     <div id="password-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden z-50 modal-enter">
         <div class="bg-[#191919] text-white rounded-2xl p-6 m-4 max-w-xs w-full shadow-2xl">
             <h3 class="text-xl font-bold mb-4 text-center">Введите пароль</h3>
@@ -452,7 +411,29 @@
         </div>
     </div>
     
-    <script>
+    <script type="module">
+        // Gemini API Integration
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+        // ВАЖНО: Замените "YOUR_API_KEY" вашим реальным API-ключом Gemini.
+        // В реальном приложении настоятельно рекомендуется использовать бэкенд-прокси
+        // или переменные окружения для защиты вашего API-ключа.
+        // Не размещайте ключ в открытом виде в клиентском коде!
+        const API_KEY = "YOUR_API_KEY"; 
+        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        
+        let genAI;
+        let model;
+
+        try {
+            genAI = new GoogleGenerativeAI(API_KEY);
+            model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        } catch (error) {
+            console.error("Failed to initialize Gemini AI. Please check your API key.", error);
+            // Если инициализация не удалась, рекомендации будут работать в стандартном режиме.
+        }
+
         // Default data for menu items and stories, will be overwritten by localStorage
         const defaultMenuItems = {
             burgers: [
@@ -1687,15 +1668,74 @@
         }
         
         /**
-         * Renders suggested items.
+         * NEW: Gets recommendations from the Gemini API.
+         * @param {Map} cart The current shopping cart.
+         * @returns {Promise<string[]>} A list of recommended item IDs.
          */
-        function renderSuggestedItems() {
+        async function getGeminiRecommendations(cart) {
+            // Do not call API if it failed to initialize or cart is empty
+            if (!model || cart.size === 0) return [];
+
+            const cartContents = Array.from(cart.values()).map(item => `${item.name} (Количество: ${item.quantity})`).join(', ');
+            const availableItems = allMenuItems.map(item => `id: "${item.id}", name: "${item.name}"`).join('; ');
+
+            const prompt = `
+                Ты — умный помощник-рекомендатель в кафе быстрого питания.
+                В корзине у покупателя сейчас находятся следующие товары: ${cartContents}.
+                Вот полный список всех доступных товаров в меню: ${availableItems}.
+
+                Проанализируй корзину и порекомендуй до 3-х дополнительных товаров из доступного списка, которые хорошо дополнят заказ.
+                Например, если в корзине есть бургер, предложи напиток или картофель фри. Если есть картофель фри, предложи соус. Если в заказе несколько основных блюд (например, 2 бургера), предложи напитки или закуску, которую можно разделить.
+
+                Твой ответ должен содержать ТОЛЬКО JSON-массив с идентификаторами (id) рекомендованных товаров. 
+                Не добавляй никаких пояснений, текста или markdown-разметки.
+                Пример правильного ответа: ["snack_1", "drink_1", "pizza_3"]
+            `;
+
+            try {
+                const result = await model.generateContent(prompt);
+                const response = await result.response;
+                let text = response.text();
+                // Clean the response to ensure it's valid JSON, removing markdown wrappers
+                const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const recommendedIds = JSON.parse(jsonString);
+                return Array.isArray(recommendedIds) ? recommendedIds : [];
+            } catch (error) {
+                console.error("Ошибка при получении рекомендаций от Gemini:", error);
+                return []; // Return empty array on error to trigger fallback
+            }
+        }
+
+        /**
+         * MODIFIED: Renders suggested items, now powered by Gemini API.
+         */
+        async function renderSuggestedItems() {
             const cartItemIds = Array.from(cart.keys());
-            const suggestedItems = allMenuItems.filter(item => !cartItemIds.includes(item.id));
+            
+            // Show a loading message while fetching recommendations
+            suggestedItemsSection.classList.remove('hidden');
+            suggestedItemsList.innerHTML = `<p class="text-gray-400 w-full text-center text-sm">Подбираем рекомендации...</p>`;
+
+            const recommendedIds = await getGeminiRecommendations(cart);
+            let suggestedItems = [];
+
+            if (recommendedIds && recommendedIds.length > 0) {
+                // Use the AI recommendations, but filter out items already in the cart
+                const finalRecommendedIds = recommendedIds.filter(id => !cartItemIds.includes(id));
+                suggestedItems = allMenuItems.filter(item => finalRecommendedIds.includes(item.id));
+            }
+            
+            // Fallback logic: if AI fails or provides no new items, use the old logic
+            if (suggestedItems.length === 0) {
+                console.log("Using fallback recommendations.");
+                const fallbackItems = allMenuItems.filter(item => !cartItemIds.includes(item.id));
+                // Shuffle and pick 4 random items for variety
+                suggestedItems = fallbackItems.sort(() => 0.5 - Math.random()).slice(0, 4);
+            }
             
             if (suggestedItems.length > 0) {
                 suggestedItemsSection.classList.remove('hidden');
-                suggestedItemsList.innerHTML = suggestedItems.slice(0, 4).map(item => `
+                suggestedItemsList.innerHTML = suggestedItems.map(item => `
                     <div class="flex-shrink-0 w-36 bg-[#241E1B] rounded-xl p-2 flex flex-col justify-between items-center text-center transform transition-transform duration-300 hover:scale-105 cursor-pointer item-card">
                         <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-full mb-2 object-cover">
                         <h3 class="font-bold text-sm">${item.name}</h3>
